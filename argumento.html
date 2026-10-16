@@ -98,6 +98,10 @@ a:focus-visible,audio:focus-visible{outline:3px solid var(--red)}
 .hint{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:6;font:400 30px Bangers,Impact;color:#ffd23f;text-shadow:2px 2px 0 #3d0510;pointer-events:none;transition:opacity .4s;white-space:nowrap}.open .hint{opacity:0}@media(prefers-reduced-motion:reduce){.hint{display:none}}
 .voz{display:inline-block;margin-top:4px;background:var(--red);color:#fff;font-family:Bangers,Impact;font-size:17px;letter-spacing:.05em;border-radius:12px;padding:0 10px}
 .aerr{flex:1 1 100%;margin:2px 0 0;font-size:15px;color:#b00020;background:#fff0f0;border:2px solid #b00020;padding:4px 8px}
+.bub{width:max-content;box-sizing:border-box;background:#fffdf8;border:2.5px solid #4a4466;color:#2b2540;padding:12px 20px;line-height:1.25;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25));overflow-wrap:break-word}
+.bub.b1{border-radius:30px 34px 28px 36px/28px 30px 34px 26px}
+.bub.b2{border-radius:36px 26px 34px 28px/30px 34px 26px 32px;padding:12px 22px}
+.bub:after{border-color:#4a4466;border-width:2.5px}
 </style></head><body><div class="wrap"><p style="margin:4px 0 0"><a href="index.html" style="color:#ffd23f;font-weight:bold">← Volver al índice</a></p>
 
 <header class="hero"><h1>LA BOHÈME</h1><p>Puccini · Cuatro actos, siete amigos sin un duro y un amor que no se puede curar</p></header>
@@ -198,10 +202,11 @@ const TRACKS=[
  {act:2,t:"Quando m'en vo (vals de Musetta)",d:"Musetta (soprano) se pavonea para Marcello",f:"audio/quando-men-vo.mp3"},
  {act:3,t:"Donde lieta uscì",d:"Mimì (soprano) se despide de Rodolfo",f:"audio/donde-lieta-usci.mp3"},
  {act:3,t:"Addio, dolce svegliare alla mattina",d:"Mimì y Rodolfo se despiden con ternura; Musetta y Marcello, a gritos",f:"audio/addio-dolce-svegliare.mp3"},
- {act:4,t:"Sono andati? Fingevo di dormire",d:"Mimì (soprano) y Rodolfo (tenor): las últimas palabras",f:"audio/sono-andati.mp3"}
+ {act:4,t:"Sono andati? Fingevo di dormire",d:"Mimì (soprano) y Rodolfo (tenor): las últimas palabras",f:"audio/sono-andati.mp3"},
 ];
 document.querySelectorAll('.tracks').forEach(el=>{
  const L=TRACKS.filter(x=>x.act==el.dataset.act);
+ if(!L.length){el.closest('.music').remove();return}
  el.innerHTML=L.map(x=>`<div class="track"><span><b>${x.t}</b><em>${x.d}</em></span><audio controls preload="none" src="${x.f}"></audio></div>`).join('');
  el.querySelectorAll('audio').forEach(au=>au.addEventListener('error',()=>{const t=au.closest('.track');if(t.querySelector('.aerr'))return;t.insertAdjacentHTML('beforeend','<p class="aerr">⚠ No se encuentra <code>'+new URL(au.getAttribute('src'),location.href).href+'</code>. La carpeta <code>audio</code> debe estar junto a este HTML (descomprime el zip entero y abre el HTML desde ahí).</p>')}));
 });
