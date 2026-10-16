@@ -136,6 +136,15 @@ h2{font-family:var(--serif);font-weight:900;font-size:clamp(2rem,5vw,3rem);line-
 .timeline li.star .what{font-weight:700;font-size:1.1rem}
 .note{font-size:.9rem;color:#bdb8f0;margin-top:6px}
 
+/* ---------- ARGUMENTO ---------- */
+.story{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:var(--paper);color:var(--ink);
+  border-radius:26px 26px 26px 6px;padding:28px 30px;position:relative}
+.story .ico{width:68px;height:68px;border-radius:50%;background:var(--gold);display:grid;place-items:center;font-size:2rem}
+.story h2{color:var(--navy);font-size:clamp(1.5rem,3.6vw,2.1rem);margin-bottom:4px}
+.story p{color:#4a4580;max-width:52ch}
+.story .btn{white-space:nowrap}
+@media (max-width:760px){.story{grid-template-columns:1fr;text-align:center;justify-items:center}}
+
 /* ---------- FORMULARIO ---------- */
 .form-sec{padding-bottom:20px}
 .form-box{background:var(--paper);color:var(--ink);border-radius:28px;padding:34px;position:relative}
@@ -260,6 +269,19 @@ footer b{color:#fff}
         <li><time>23:15</time><span class="what"><b>Regreso</b></span></li>
         <li><time>0:30</time><span class="what">Llegada a Huelva (aprox.)</span></li>
       </ol>
+    </div>
+  </section>
+
+  <section id="argumento">
+    <div class="wrap">
+      <div class="story">
+        <div class="ico" aria-hidden="true">📖</div>
+        <div>
+          <h2>Antes de ir, conoce la historia</h2>
+          <p>Artistas jóvenes, un invierno en París y un amor que lo cambia todo. Leer el argumento de La Bohème te ayudará a disfrutar mucho más de la ópera.</p>
+        </div>
+        <a class="btn" href="https://mgarper686.github.io/excursion/argumento.html">Leer el argumento</a>
+      </div>
     </div>
   </section>
 
