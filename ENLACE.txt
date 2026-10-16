@@ -1,0 +1,5 @@
+Añade esto en tu index.html donde quieras que aparezca el enlace:
+
+<a href="argumento.html">Argumento de La bohème (en cómic)</a>
+
+Sube argumento.html y la carpeta audio/ al MISMO sitio donde está tu index.html.

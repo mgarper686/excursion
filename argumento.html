@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argumento · La bohème de Puccini</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d1a2b;--paper:#fffdf5;--red:#e63946;--yel:#ffd23f;--blue:#2a4d8f;--bg:#2b2d52}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.35 "Patrick Hand","Comic Sans MS",cursive;
+background-image:radial-gradient(#ffffff14 2px,transparent 2px);background-size:18px 18px}
+.wrap{max-width:1000px;margin:auto;padding:16px}
+h1,h2,.sfx{font-family:Bangers,Impact,sans-serif;font-weight:400;letter-spacing:.04em}
+.hero{background:var(--yel);border:5px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:18px;text-align:center;transform:rotate(-1deg);margin:10px 0 28px}
+.hero h1{font-size:clamp(44px,9vw,88px);margin:0;line-height:1;color:var(--red);text-shadow:3px 3px 0 var(--ink)}
+.hero p{margin:6px 0 0;font-size:22px}
+.box{background:var(--paper);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:14px 18px;margin-bottom:22px}
+.ctx{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.ctx div{border:3px dashed var(--ink);padding:8px 12px;background:#fff}
+.ctx b{font-family:Bangers;font-size:26px;color:var(--red);display:block;font-weight:400}
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;text-align:center}
+.cast figure{margin:0;background:#fff;border:3px solid var(--ink);padding:6px}
+.cast figcaption{font-size:16px;line-height:1.15}
+.cast figcaption b{font-family:Bangers;font-size:22px;font-weight:400;display:block}
+.act{margin:34px 0}
+.acthead{display:inline-block;background:var(--red);color:#fff;border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:4px 18px;transform:rotate(-1.5deg);margin-bottom:14px}
+.acthead h2{margin:0;font-size:clamp(26px,5vw,40px)}
+.acthead small{font-size:17px;font-family:"Patrick Hand"}
+.panels{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.p{position:relative;border:4px solid var(--ink);min-height:500px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:var(--c,#cde)}
+.p.wide{grid-column:span 2}
+.chars{position:relative;z-index:1;background:linear-gradient(to top,#0000002e 0 14px,transparent 14px);display:flex;justify-content:center;align-items:flex-end;gap:0;padding:0 4px;flex:1}
+.chars svg{flex:1 1 0;min-width:0;max-width:130px;height:auto}
+.cap{background:var(--yel);border-top:3px solid var(--ink);padding:6px 10px;font-size:17px;line-height:1.25}
+.bub{rotate:var(--rot,0deg);transform-origin:var(--t,34px) 100%;position:absolute;background:#fff;border:3px solid var(--ink);padding:10px 16px;max-width:44%;font-size:16px;line-height:1.2;z-index:2;text-align:center}
+.bub.b1{border-radius:50% 46% 52% 48%/56% 50% 50% 44%}
+.bub.b2{border-radius:48%/62% 58% 42% 38%;padding:12px 20px}
+.bub:after{content:"";position:absolute;top:calc(100% - 4px);left:var(--t,34px);margin-left:-9px;width:16px;height:26px;background:#fff;border:3px solid var(--ink);border-top:0;border-left:0;border-radius:0 0 100% 0;transform:skewX(-24deg)}
+.bub.r:after{transform:scaleX(-1) skewX(-24deg)}
+.sfx{position:absolute;left:8px;bottom:96px;color:var(--red);font-size:30px;text-shadow:2px 2px 0 var(--ink);z-index:0;transform:rotate(-8deg)}
+.music{margin-top:12px;background:var(--paper);border:3px solid var(--ink);padding:8px 12px}
+.music h3{margin:0 0 4px;font:400 24px Bangers;color:var(--blue)}
+.track{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 0;border-top:2px dotted var(--ink)}
+.track span{flex:1 1 230px}.track em{display:block;font-size:15px;opacity:.75}
+.track audio{flex:1 1 230px;max-width:100%;height:36px}
+.end{background:var(--paper);border:4px solid var(--ink);padding:14px 18px;text-align:center;box-shadow:6px 6px 0 var(--ink)}
+@media(max-width:640px){.panels{grid-template-columns:1fr}.p.wide{grid-column:auto}.bub{max-width:62%}}
+a:focus-visible,audio:focus-visible{outline:3px solid var(--red)}
+
+
+.up{animation:breathe 5s ease-in-out infinite;animation-delay:var(--o)}
+.hd{transform-box:view-box;transform-origin:70px 98px;animation:look 10s ease-in-out infinite;animation-delay:var(--o)}
+.ey{transform-box:fill-box;transform-origin:center;animation:blink 10s infinite;animation-delay:var(--b)}
+.pu{animation:gaze 10s ease-in-out infinite;animation-delay:var(--b)}
+.br,.mu{transform-box:fill-box;transform-origin:center;animation:brow 10s ease-in-out infinite;animation-delay:var(--o)}
+.mu{animation-name:smile}
+.aL,.aR{transform-box:view-box;animation:swayl 10s ease-in-out infinite;animation-delay:var(--o)}
+.aL{transform-origin:32px 128px}
+.aR{transform-origin:108px 128px;animation-name:adjust}
+.hold .aL,.hold .aR{animation:none}
+.p:not(.vis) svg *{animation-play-state:paused}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+@keyframes look{0%,100%{transform:rotate(0)}14%{transform:rotate(-2deg)}19%{transform:rotate(-1.5deg)}38%{transform:rotate(.6deg)}55%{transform:rotate(0)}70%{transform:rotate(1.9deg)}76%{transform:rotate(1.4deg)}90%{transform:rotate(.3deg)}}
+@keyframes blink{0%,17.5%{transform:scaleY(1)}19%{transform:scaleY(.1)}20.5%,52.5%{transform:scaleY(1)}54%{transform:scaleY(.1)}55.5%,85.5%{transform:scaleY(1)}87%{transform:scaleY(.1)}88.5%,100%{transform:scaleY(1)}}
+@keyframes gaze{0%,100%{transform:translate(0,0)}20%{transform:translate(1px,.3px)}45%{transform:translate(-.8px,-.2px)}70%{transform:translate(.5px,.6px)}}
+@keyframes brow{0%,100%{transform:translateY(0)}28%{transform:translateY(-1.2px)}40%{transform:translateY(0)}72%{transform:translateY(-.8px)}80%{transform:translateY(0)}}
+@keyframes smile{0%,100%{transform:scale(1,1)}35%{transform:scale(1.05,1.1)}60%{transform:scale(1,1)}}
+@keyframes swayl{0%,100%{transform:rotate(0)}30%{transform:rotate(1.8deg)}60%{transform:rotate(.4deg)}}
+@keyframes adjust{0%,58%,100%{transform:rotate(0)}64%{transform:rotate(-6deg)}70%{transform:rotate(-5deg)}78%{transform:rotate(1deg)}86%{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){svg *{animation:none!important}}
+
+.stage{position:absolute;inset:0;z-index:0}.stage svg{width:100%;height:100%;display:block}
+.a1,.a4{--fl:#6b4529;--pl:rgba(0,0,0,.28)}.a2{--fl:#4d4d5c;--pl:rgba(0,0,0,.3)}.a3{--fl:#e6edf7;--pl:rgba(70,100,150,.2)}
+.chars{background:linear-gradient(rgba(255,255,255,.3) 0 3px,transparent 3px) left bottom/100% 30px no-repeat,repeating-linear-gradient(90deg,var(--pl,#0003) 0 2px,transparent 2px 52px) left bottom/100% 30px no-repeat,linear-gradient(var(--fl,#6b4529),var(--fl,#6b4529)) left bottom/100% 30px no-repeat}
+.cap{position:relative;z-index:9}.bub{z-index:7}
+.cur{position:absolute;top:0;bottom:0;width:52%;z-index:4;background:linear-gradient(90deg,rgba(0,0,0,.35),transparent 18%,rgba(255,255,255,.14) 40%,transparent 55%,rgba(0,0,0,.3)),repeating-linear-gradient(90deg,#9e0b1a 0 12px,#d0202f 12px 24px,#7a0814 24px 32px);transition:transform 1.9s cubic-bezier(.6,.05,.3,1),clip-path 1.9s cubic-bezier(.6,.05,.3,1)}
+.cur.l{left:0;transform-origin:0 0;clip-path:polygon(0 0,100% 0,100% 25%,100% 50%,100% 60%,100% 80%,100% 100%,0 100%)}
+.cur.r{right:0;transform-origin:100% 0;clip-path:polygon(100% 0,0 0,0 25%,0 50%,0 60%,0 80%,0 100%,100% 100%)}
+.open .cur.l{transform:scaleX(.26);clip-path:polygon(0 0,100% 0,92% 25%,58% 50%,52% 60%,66% 80%,100% 100%,0 100%)}
+.open .cur.r{transform:scaleX(.26);clip-path:polygon(100% 0,0 0,8% 25%,42% 50%,48% 60%,34% 80%,0 100%,100% 100%)}
+.cur::after{content:"";position:absolute;left:0;right:0;top:55%;height:14px;background:linear-gradient(#ffd23f,#b8860b);border-radius:7px;opacity:0;transition:opacity .8s 1.2s}.open .cur::after{opacity:1}
+.nt .cur{transition:none}
+.val{position:absolute;left:0;right:0;top:0;height:36px;z-index:5;background:linear-gradient(#7d0f1f,#7d0f1f) top/100% 20px no-repeat,radial-gradient(circle at 20px 0,#8c1224 17px,transparent 18px) 0 18px/40px 20px repeat-x;border-top:4px solid #ffd23f;filter:drop-shadow(0 3px 2px #0006)}
+.js .bub{opacity:0;transition:opacity .5s}.open .bub{opacity:1}
+.p{cursor:pointer}
+.lgL,.lgR{transform-box:view-box}.lgL{transform-origin:54px 186px}.lgR{transform-origin:86px 186px}
+.walk .lgL{animation:legA .8s ease-in-out infinite}.walk .lgR{animation:legB .8s ease-in-out infinite}
+.walk .up{animation:wbob .4s ease-in-out infinite}
+.walk .aL{animation:armA .8s ease-in-out infinite}.walk .aR{animation:armB .8s ease-in-out infinite}
+.hi .aR{animation:hi 2.4s ease-in-out 1}
+.hold .aL,.hold .aR{animation:none}
+@keyframes legA{0%,50%,100%{transform:rotate(0)}25%{transform:rotate(18deg)}75%{transform:rotate(-18deg)}}
+@keyframes legB{0%,50%,100%{transform:rotate(0)}25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
+@keyframes wbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes armA{0%,50%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+@keyframes armB{0%,50%,100%{transform:rotate(0)}25%{transform:rotate(14deg)}75%{transform:rotate(-14deg)}}
+@keyframes hi{0%,100%{transform:rotate(0)}18%{transform:rotate(-125deg)}30%{transform:rotate(-105deg)}42%{transform:rotate(-130deg)}54%{transform:rotate(-105deg)}66%{transform:rotate(-125deg)}}
+@media(prefers-reduced-motion:reduce){.cur,.val{display:none}.js .bub{opacity:1}}
+.hint{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:6;font:400 30px Bangers,Impact;color:#ffd23f;text-shadow:2px 2px 0 #3d0510;pointer-events:none;transition:opacity .4s;white-space:nowrap}.open .hint{opacity:0}@media(prefers-reduced-motion:reduce){.hint{display:none}}
+.voz{display:inline-block;margin-top:4px;background:var(--red);color:#fff;font-family:Bangers,Impact;font-size:17px;letter-spacing:.05em;border-radius:12px;padding:0 10px}
+.aerr{flex:1 1 100%;margin:2px 0 0;font-size:15px;color:#b00020;background:#fff0f0;border:2px solid #b00020;padding:4px 8px}
+</style></head><body><div class="wrap"><p style="margin:4px 0 0"><a href="index.html" style="color:#ffd23f;font-weight:bold">← Volver al índice</a></p>
+
+<header class="hero"><h1>LA BOHÈME</h1><p>Puccini · Cuatro actos, siete amigos sin un duro y un amor que no se puede curar</p></header>
+
+<section class="box">
+<h2 style="font-size:34px;margin:0 0 6px;color:var(--blue)">Antes de que se alce el telón</h2>
+<p style="margin:0 0 10px"><b>París, hacia 1830-40.</b> Un grupo de jóvenes artistas vive en una buhardilla helada: sin dinero, sin calefacción, pero con ganas de comerse el mundo. A esa vida se la llamaba <b>bohemia</b>. Puccini la convirtió en ópera: reír, enamorarse y, de repente, llorar.</p>
+<div class="ctx">
+<div><b>1896, Turín</b>Estreno, dirigido por un joven Toscanini. Al principio la crítica fue tibia… el público no.</div>
+<div><b>La fuente</b>Novela por entregas de Henri Murger, <i>Escenas de la vida bohemia</i> (1851), basada en su propia juventud.</div>
+<div><b>El equipo</b>Música de Giacomo Puccini; libreto de Giuseppe Giacosa y Luigi Illica.</div>
+<div><b>El enemigo invisible</b>La tuberculosis: en el siglo XIX mataba a mucha gente joven y pobre. Mimì no es una excepción.</div>
+</div></section>
+
+<section class="box"><h2 style="font-size:30px;margin:0 0 8px">El reparto</h2>
+<div class="cast" id="cast"></div>
+<p style="margin:12px 0 0;font-size:17px"><b>¿Qué voz es cada una?</b> <b>Soprano</b>: la voz femenina más aguda · <b>Tenor</b>: la masculina más aguda, la del galán · <b>Barítono</b>: masculina intermedia, cálida · <b>Bajo</b>: la más grave de todas (el <i>buffo</i> es el bajo de papeles cómicos).</p></section>
+
+<!-- ACTO I -->
+<section class="act"><div class="acthead"><h2>ACTO I · La buhardilla</h2><small>Nochebuena, barrio Latino</small></div>
+<div class="panels">
+<div class="p" style="--c:#9ec5e8"><span class="sfx">¡BRRR!</span><div class="bub" data-s="rodolfo" style="left:10px;top:12px">¡Quema mi manuscrito! ¡Al menos dará calor!</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="marcello"></i><i data-c="colline"></i><i data-c="schaunard"></i></div>
+<div class="cap">Cuatro amigos, una estufa sin leña. Rodolfo, el poeta, sacrifica su drama para calentarse un rato.</div></div>
+<div class="p" style="--c:#c9b6e4"><span class="sfx">¡GLUP!</span><div class="bub" data-s="marcello" style="left:10px;top:12px">¿El alquiler? Eh… ¡tome otra copa, don Benoît!</div>
+<div class="chars"><i data-c="benoit"></i><i data-c="marcello"></i><i data-c="schaunard"></i></div>
+<div class="cap">El casero viene a cobrar. Lo emborrachan, fingen indignación y lo echan sin pagar. ¡Genios!</div></div>
+<div class="p" style="--c:#f6c1b8"><div class="bub" data-s="mimi" style="left:10px;top:12px">Perdone… ¿me da fuego para mi vela?</div><div class="bub r" data-s="rodolfo" style="right:10px;top:90px">(¡Vaya vecina!)</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="mimi"></i></div>
+<div class="cap">Los amigos se van al Café Momus. Rodolfo se queda escribiendo… y llama Mimì, la costurera del piso de arriba.</div></div>
+<div class="p" style="--c:#ffb3c6"><span class="sfx">¡AMOR!</span><div class="bub" data-s="rodolfo" style="left:10px;top:12px">¡Qué fría tienes la manita! Déjame que te la caliente.</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="mimi"></i></div>
+<div class="cap">Se apaga la vela, se pierde una llave, se rozan las manos… y se enamoran. Salen juntos hacia el café.</div></div>
+</div>
+<div class="music"><h3>Para escuchar</h3><div class="tracks" data-act="1"></div></div></section>
+
+<!-- ACTO II -->
+<section class="act"><div class="acthead"><h2>ACTO II · Café Momus</h2><small>Barrio Latino, la fiesta de la noche</small></div>
+<div class="panels">
+<div class="p wide" style="--c:#ffe08a"><div class="bub" data-s="rodolfo" style="left:10px;top:12px">Os presento a Mimì, mi… ¡mi nueva amiga!</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="mimi"></i><i data-c="marcello"></i><i data-c="colline"></i><i data-c="schaunard"></i></div>
+<div class="cap">Calle llena de vendedores, niños y gente de fiesta. Rodolfo presenta a Mimì a toda la pandilla.</div></div>
+<div class="p" style="--c:#f4a6a6"><span class="sfx">¡CHAN!</span><div class="bub" data-s="musetta" style="left:10px;top:12px">¡Qué mal me aprietan los zapatos, Alcindoro! Ve a por otros.</div>
+<div class="chars"><i data-c="musetta"></i><i data-c="alcindoro"></i></div>
+<div class="cap">Llega Musetta, ex de Marcello, con un señor rico y mayor. Quiere que Marcello la mire… y lo logra.</div></div>
+<div class="p" style="--c:#a8e0c2"><span class="sfx">¡TRA-TA-TÁ!</span><div class="bub r" data-s="musetta" style="right:10px;top:12px">¡La cuenta, para el señor de los zapatos!</div>
+<div class="chars"><i data-c="musetta"></i><i data-c="marcello"></i><i data-c="mimi"></i><i data-c="rodolfo"></i></div>
+<div class="cap">Se escapan desfilando tras una banda militar. Alcindoro vuelve y paga lo de todos. Final de acto de comedia.</div></div>
+</div>
+<div class="music"><h3>Para escuchar</h3><div class="tracks" data-act="2"></div></div></section>
+
+<!-- ACTO III -->
+<section class="act"><div class="acthead"><h2>ACTO III · La Barrière d’Enfer</h2><small>Amanece, nieva, empieza lo difícil</small></div>
+<div class="panels">
+<div class="p" style="--c:#b8c4d6"><span class="sfx">¡COF!</span><div class="bub" data-s="mimi" style="left:10px;top:12px">Marcello, ayúdame. Rodolfo me deja sola con sus celos…</div>
+<div class="chars"><i data-c="mimi"></i><i data-c="marcello"></i></div>
+<div class="cap">Meses después. Mimì está enferma (tuberculosis) y su relación con Rodolfo se ha roto a gritos.</div></div>
+<div class="p" style="--c:#8f9bb8"><div class="bub" data-s="rodolfo" style="left:10px;top:12px">Digo que no la quiero… pero tiene los días contados y yo no tengo nada.</div><div class="bub r" data-s="mimi" style="right:10px;top:110px">(¡Lo oigo todo!)</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="marcello"></i><i data-c="mimi"></i></div>
+<div class="cap">Rodolfo confiesa: no es desamor, es miedo. Es demasiado pobre para cuidarla. Mimì escucha escondida.</div></div>
+<div class="p" style="--c:#d7c6ea"><div class="bub" data-s="mimi" style="left:10px;top:12px">Esperemos a la primavera. Con frío, mejor juntos.</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="mimi"></i></div>
+<div class="cap">Una tos la delata. Se despiden con ternura… pero aplazan la ruptura hasta que llegue el buen tiempo.</div></div>
+<div class="p" style="--c:#f5b5a0"><span class="sfx">¡PLAF!</span><div class="bub" data-s="marcello" style="left:10px;top:12px">¡Coqueta!</div><div class="bub r" data-s="musetta" style="right:10px;top:12px">¡Celoso!</div>
+<div class="chars"><i data-c="marcello"></i><i data-c="musetta"></i></div>
+<div class="cap">Mientras, Marcello y Musetta se pelean a voces y se separan. Un cuarteto: dos parejas, dos finales distintos.</div></div>
+</div>
+<div class="music"><h3>Para escuchar</h3><div class="tracks" data-act="3"></div></div></section>
+
+<!-- ACTO IV -->
+<section class="act"><div class="acthead"><h2>ACTO IV · La buhardilla</h2><small>Otoño. Vuelta al principio</small></div>
+<div class="panels">
+<div class="p" style="--c:#e8d9a8"><div class="bub" data-s="rodolfo" style="left:10px;top:12px">Nos dejó… y aquí estamos, pintando y escribiendo su recuerdo.</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="marcello"></i></div>
+<div class="cap">Los dos amigos trabajan fingiendo que no echan de menos a sus ex. Llegan Colline y Schaunard con pan y arenque: ¡banquete! Bailan para animarse.</div></div>
+<div class="p" style="--c:#c4c0e0"><span class="sfx">¡AY!</span><div class="bub" data-s="musetta" style="left:10px;top:12px">¡Es Mimì! Está muy mal. Quería volver aquí, a tu lado.</div>
+<div class="chars"><i data-c="musetta"></i><i data-c="mimi"></i><i data-c="rodolfo"></i></div>
+<div class="cap">Musetta irrumpe con Mimì, casi sin fuerzas. La tumban en la cama de Rodolfo.</div></div>
+<div class="p" style="--c:#a9d6c8"><div class="bub" data-s="colline" style="left:10px;top:12px">¡Vendo mi abrigo! Adiós, vieja zimarra, gracias por todo.</div><div class="bub r" data-s="musetta" style="right:10px;top:110px">¡Y mis pendientes!</div>
+<div class="chars"><i data-c="colline"></i><i data-c="musetta"></i><i data-c="schaunard"></i></div>
+<div class="cap">Todos se desviven por ella. Colline empeña su abrigo; Musetta, sus pendientes. Para medicinas y un médico.</div></div>
+<div class="p" style="--c:#7e86a8"><span class="sfx">¡MIMÌ!</span><div class="bub" data-s="mimi" style="left:10px;top:12px">¿Te acuerdas de la vela y de la llave…?</div>
+<div class="chars"><i data-c="rodolfo"></i><i data-c="mimi"></i></div>
+<div class="cap">A solas, recuerdan su primer encuentro. Mimì se duerme tranquila. Cuando los demás vuelven, ya no despierta. Rodolfo grita su nombre. Telón.</div></div>
+</div>
+<div class="music"><h3>Para escuchar</h3><div class="tracks" data-act="4"></div></div></section>
+
+<section class="end"><h2 style="font-size:32px;margin:0 0 6px;color:var(--red)">¿Por qué sigue emocionando 130 años después?</h2>
+<p style="margin:0">Porque no hay dioses ni reyes: son jóvenes, pobres, torpes y enamorados, como cualquiera. Por eso la risa del acto II duele tanto en el IV.</p></section>
+</div>
+
+<script>
+/* === AUDIOS: cambia aquí los nombres de tus mp3 (carpeta "audio" junto a este HTML) === */
+const TRACKS=[
+ {act:1,t:"Che gelida manina",d:"Rodolfo (tenor) se presenta a Mimì",f:"audio/che-gelida-manina.mp3"},
+ {act:1,t:"Sì, mi chiamano Mimì",d:"Mimì (soprano) cuenta quién es",f:"audio/si-mi-chiamano-mimi.mp3"},
+ {act:1,t:"O soave fanciulla",d:"Dúo de amor: Rodolfo (tenor) y Mimì (soprano)",f:"audio/o-soave-fanciulla.mp3"},
+ {act:2,t:"Quando m'en vo (vals de Musetta)",d:"Musetta (soprano) se pavonea para Marcello",f:"audio/quando-men-vo.mp3"},
+ {act:3,t:"Donde lieta uscì",d:"Mimì (soprano) se despide de Rodolfo",f:"audio/donde-lieta-usci.mp3"},
+ {act:3,t:"Addio, dolce svegliare alla mattina",d:"Mimì y Rodolfo se despiden con ternura; Musetta y Marcello, a gritos",f:"audio/addio-dolce-svegliare.mp3"},
+ {act:4,t:"Sono andati? Fingevo di dormire",d:"Mimì (soprano) y Rodolfo (tenor): las últimas palabras",f:"audio/sono-andati.mp3"}
+];
+document.querySelectorAll('.tracks').forEach(el=>{
+ const L=TRACKS.filter(x=>x.act==el.dataset.act);
+ el.innerHTML=L.map(x=>`<div class="track"><span><b>${x.t}</b><em>${x.d}</em></span><audio controls preload="none" src="${x.f}"></audio></div>`).join('');
+ el.querySelectorAll('audio').forEach(au=>au.addEventListener('error',()=>{const t=au.closest('.track');if(t.querySelector('.aerr'))return;t.insertAdjacentHTML('beforeend','<p class="aerr">⚠ No se encuentra <code>'+au.getAttribute('src')+'</code>. La carpeta <code>audio</code> debe estar junto a este HTML (descomprime el zip entero y abre el HTML desde ahí).</p>')}));
+});
+
+/* === Personajes de cómic (SVG) === */
+const S='stroke="#1d1a2b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"';
+const T=(f,h=206)=>`<path d="M18 ${h}Q12 124 70 112Q128 124 122 ${h}Z" fill="${f}" ${S}/>`;
+const H=(x,y,s)=>{const f=[[-5,5,-6,13],[-1.7,6,-1.8,15],[1.7,6,2,14.5],[5,5,6.5,12],[-6,-1,-11,6]],d=f.map(v=>`M${x+v[0]} ${y+v[1]}L${x+v[2]} ${y+v[3]}`).join("");return `<path d="${d}" stroke="#1d1a2b" stroke-width="6.2" stroke-linecap="round" fill="none"/><path d="${d}" stroke="${s}" stroke-width="3.4" stroke-linecap="round" fill="none"/><ellipse cx="${x}" cy="${y}" rx="7.5" ry="6.5" fill="${s}" ${S}/>`};
+const dot=(x,y,r,f)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"/>`;
+const C={
+rodolfo:{n:"Rodolfo",pt:"#4a4560",sl:"#3b3350",ar:[[46,170],[106,170]],r:"poeta",sk:"#f2c9a0",
+ back:`<path d="M44 62Q38 26 70 24Q102 26 96 62L102 92Q90 72 70 74Q50 72 38 92Z" fill="#2b1d14" ${S}/>`,
+ body:T("#3b3350",236)+`<path d="M52 116L70 190L88 116Q70 128 52 116Z" fill="#8b2f3c" ${S}/>`+dot(70,150,2.5,"#ffd23f")+dot(70,166,2.5,"#ffd23f")+`<path d="M48 106Q70 128 92 106L98 122Q70 142 42 122Z" fill="#e63946" ${S}/><path d="M82 124L98 164L86 168L74 134Z" fill="#c92d3a" ${S}/>`,
+ front:`<path d="M46 54Q48 28 72 28Q94 30 94 54Q86 40 72 42Q58 42 46 54Z" fill="#2b1d14" ${S}/>`,
+ props:`<g transform="rotate(-10 30 160)"><rect x="6" y="140" width="46" height="36" rx="3" fill="#c0392b" ${S}/><rect x="10" y="144" width="38" height="28" fill="none" stroke="#ffd23f" stroke-width="2"/><rect x="16" y="151" width="26" height="8" fill="#ffd23f"/><path d="M8 178h42" stroke="#fffdf5" stroke-width="4"/></g>`+H(48,172,"#f2c9a0")+`<path d="M102 176L124 104" stroke="#1d1a2b" stroke-width="3.5" stroke-linecap="round"/><path d="M124 104Q138 112 131 146Q119 142 117 128Z" fill="#fffdf5" ${S}/><path d="M124 104L126 138" stroke="#1d1a2b" stroke-width="1.6"/>`+dot(102,177,2.5,"#1d1a2b")+H(106,170,"#f2c9a0")},
+marcello:{n:"Marcello",pt:"#5b4a3a",sl:"#cfd8e6",ar:[[30,170],[102,172]],r:"pintor",sk:"#f0bf94",
+ body:T("#cfd8e6",236)+`<path d="M44 130Q70 120 96 130L100 190H40Z" fill="#b9c4d6" ${S}/>`+dot(30,150,5,"#e63946")+dot(112,142,5,"#2a4d8f")+dot(108,170,4,"#ffd23f")+dot(52,172,4,"#3a9d5a"),
+ front:`<path d="M46 56Q48 36 70 36Q92 36 94 56Q82 46 70 48Q58 46 46 56Z" fill="#3b2a1a" ${S}/><path d="M56 76Q70 68 84 76Q70 80 56 76Z" fill="#3b2a1a"/><path d="M42 42Q42 20 74 22Q104 20 98 44Q80 34 42 42Z" fill="#e63946" ${S}/><circle cx="88" cy="19" r="4" fill="#e63946" ${S}/>`,
+ props:`<path d="M6 138Q30 114 54 138Q52 172 26 174Q2 170 6 138Z" fill="#c8915a" ${S}/><circle cx="20" cy="140" r="3" fill="#fff"/>`+dot(32,134,3.5,"#e63946")+dot(44,144,3.5,"#ffd23f")+dot(18,156,3.5,"#2a4d8f")+dot(36,160,3.5,"#3a9d5a")+H(30,172,"#f0bf94")+`<path d="M100 176L126 120" ${S} fill="none"/><path d="M126 120L130 110L134 122Z" fill="#e63946" ${S}/>`+H(102,174,"#f0bf94")},
+colline:{n:"Colline",hold:1,pt:"#33333a",sl:"#4a4a52",ar:[[20,164],[122,164]],r:"filósofo",sk:"#e8b88a",
+ back:`<path d="M46 66Q40 40 52 34L52 66Z" fill="#a8a8a8" ${S}/><path d="M94 66Q100 40 88 34L88 66Z" fill="#a8a8a8" ${S}/>`,
+ body:T("#4a4a52",262)+`<path d="M44 116L70 160L96 116L90 108L70 124L50 108Z" fill="#6a6a75" ${S}/>`,
+ front:`<path d="M50 72Q54 108 70 110Q86 108 90 72Q80 88 70 86Q60 88 50 72Z" fill="#8a8a8a" ${S}/><circle cx="60" cy="60" r="9" fill="#cfe8ff" fill-opacity=".35" ${S}/><circle cx="80" cy="60" r="9" fill="#cfe8ff" fill-opacity=".35" ${S}/><path d="M69 60h2M44 58L51 60M96 58L89 60" ${S} fill="none"/>`,
+ props:`<rect x="14" y="156" width="112" height="14" fill="#3a7d5a" ${S}/><rect x="20" y="170" width="104" height="14" fill="#8a4b2a" ${S}/><rect x="10" y="142" width="96" height="14" fill="#c0392b" ${S}/><path d="M22 147h70" stroke="#ffd23f" stroke-width="2"/>`+H(20,164,"#e8b88a")+H(122,164,"#e8b88a")},
+schaunard:{n:"Schaunard",pt:"#5a5a66",sl:"#3a7d5a",ar:[[46,150],[98,176]],r:"músico",sk:"#f5cfa8",
+ body:T("#3a7d5a")+`<path d="M54 114L70 150L86 114Z" fill="#f4f0e6" ${S}/><path d="M60 118L80 118L70 128Z" fill="#ffd23f" ${S}/>`,
+ front:`<path d="M44 58Q40 26 72 26Q102 28 96 58Q86 40 70 42Q56 40 44 58Z" fill="#b0742e" ${S}/><path d="M56 78Q70 72 84 78" stroke="#b0742e" stroke-width="3" fill="none"/>`,
+ props:`<g transform="rotate(-18 32 168)"><path d="M20 140Q6 150 20 162Q8 176 30 184Q52 184 42 164Q56 152 40 140Q30 136 20 140Z" fill="#b5651d" ${S}/><path d="M24 156q0 8 0 14M38 156q0 8 0 14" stroke="#1d1a2b" stroke-width="2"/></g>`+H(46,150,"#f5cfa8")+`<path d="M92 184L132 128" ${S} fill="none"/>`+H(98,176,"#f5cfa8")},
+mimi:{n:"Mimì",sl:"#7e5ba6",ar:[[34,168],[108,174]],r:"costurera",sk:"#fbe3d3",
+ back:`<circle cx="70" cy="18" r="13" fill="#6b3a1e" ${S}/><path d="M44 62Q38 28 70 26Q102 28 96 62Q96 90 90 100L50 100Q44 90 44 62Z" fill="#6b3a1e" ${S}/>`,
+ body:`<path d="M24 190Q16 240 12 282L128 282Q124 240 116 190Z" fill="#8c5a3c" ${S}/><path d="M20 262H120" stroke="#6b3f26" stroke-width="3"/>`+T("#7e5ba6",200)+`<path d="M50 108L70 150L90 108L98 120Q70 160 42 120Z" fill="#9b7cc4" ${S}/>`,
+ front:`<path d="M46 56Q48 32 70 32Q92 32 94 56Q84 44 70 46Q56 44 46 56Z" fill="#6b3a1e" ${S}/><circle cx="54" cy="72" r="5" fill="#f4a6a6" opacity=".7"/><circle cx="86" cy="72" r="5" fill="#f4a6a6" opacity=".7"/>`,
+ props:`<circle cx="32" cy="162" r="17" fill="#fffdf5" ${S}/>`+dot(32,162,4,"#ffd23f")+dot(32,152,3.5,"#e63946")+dot(41,162,3.5,"#e63946")+dot(32,172,3.5,"#e63946")+dot(23,162,3.5,"#e63946")+`<rect x="102" y="150" width="14" height="30" fill="#f6f0d8" ${S}/><path class="fl" d="M109 128Q100 140 109 150Q118 140 109 128Z" fill="#ffb703" ${S}/>`+H(108,176,"#fbe3d3")},
+musetta:{n:"Musetta",sl:"#f7d3b5",ar:[[22,198,1],[106,174]],r:"cantante",sk:"#f7d3b5",
+ back:`<path d="M40 70Q30 24 70 22Q110 24 100 70Q108 96 96 100Q96 80 90 70L50 70Q44 80 44 100Q32 96 40 70Z" fill="#f2c744" ${S}/>`,
+ body:`<path d="M18 200Q14 130 50 122L90 122Q126 130 122 200Q138 245 134 282L6 282Q2 245 18 200Z" fill="#d62839" ${S}/><path d="M20 206Q70 220 120 206" stroke="#8d1a26" stroke-width="3" fill="none"/><path d="M8 270Q70 284 132 270" stroke="#fff" stroke-width="4" fill="none"/><path d="M42 122Q70 142 98 122Q100 108 88 106L52 106Q40 108 42 122Z" fill="#f7d3b5" ${S}/>`+[54,62,70,78,86].map((x,i)=>dot(x,124+[2,6,8,6,2][i],2.6,"#fff")).join(""),
+ front:`<path d="M46 54Q50 34 72 34Q94 36 94 54Q84 44 72 46Q58 44 46 54Z" fill="#f2c744" ${S}/><path d="M64 84Q70 80 76 84Q70 90 64 84Z" fill="#c1121f"/>`+dot(44,76,3.5,"#ffd23f")+dot(96,76,3.5,"#ffd23f")+`<ellipse cx="74" cy="26" rx="36" ry="9" fill="#d62839" ${S} transform="rotate(-12 74 26)"/><path d="M96 20Q122 4 126 34Q110 26 96 28Z" fill="#fff" ${S}/>`,
+ props:`<path d="M106 176L82 130Q116 112 138 146Z" fill="#fffdf5" ${S}/><path d="M106 176L96 124M106 176L112 124M106 176L128 128" stroke="#d62839" stroke-width="2"/>`+H(106,176,"#f7d3b5")},
+alcindoro:{n:"Alcindoro",pt:"#555",sl:"#2c2840",ar:[[24,150],[118,198,1]],r:"el rico",sk:"#e6b995",
+ back:`<path d="M44 52Q40 70 46 80L50 60Z" fill="#e8e8e8" ${S}/><path d="M96 52Q100 70 94 80L90 60Z" fill="#e8e8e8" ${S}/>`,
+ body:T("#1d1a2b",240)+`<path d="M54 114L70 160L86 114Z" fill="#fff" ${S}/><path d="M60 118L80 118L70 130Z" fill="#c1121f" ${S}/>`,
+ front:`<path d="M54 78Q70 70 86 78Q70 84 54 78Z" fill="#e8e8e8" ${S}/><circle cx="80" cy="60" r="8" fill="none" ${S}/><path d="M86 66Q96 90 92 112" stroke="#b8860b" stroke-width="1.5" fill="none"/><rect x="48" y="2" width="44" height="26" fill="#1d1a2b" ${S}/><rect x="40" y="26" width="60" height="6" rx="3" fill="#1d1a2b" ${S}/>`,
+ props:`<path d="M24 188L24 134" stroke="#5a3a1a" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="130" r="7" fill="#ffd23f" ${S}/>`+H(24,150,"#e6b995")},
+benoit:{n:"Benoît",pt:"#5a4630",sl:"#7a4e2d",ar:[[22,198,1],[86,166]],r:"el casero",sk:"#e9b58c",
+ back:`<path d="M44 52Q36 76 46 90L50 62Z" fill="#9a9a9a" ${S}/><path d="M96 52Q104 76 94 90L90 62Z" fill="#9a9a9a" ${S}/>`,
+ body:T("#7a4e2d",224)+`<path d="M52 114L70 150L88 114Z" fill="#f2f2f2" ${S}/>`+dot(70,164,3,"#ffd23f")+dot(70,178,3,"#ffd23f"),
+ front:`<path d="M46 50Q50 32 70 32Q90 32 94 50Q84 38 70 40Q56 38 46 50Z" fill="#9a9a9a" ${S}/><path d="M52 50L66 54M88 50L74 54" ${S} fill="none"/><path d="M56 78Q70 72 84 78" stroke="#9a9a9a" stroke-width="4" fill="none"/>`,
+ props:`<rect x="84" y="136" width="42" height="48" fill="#fffdf5" ${S} transform="rotate(6 105 160)"/><path d="M92 148h26M92 156h26M92 164h18" stroke="#1d1a2b" stroke-width="2" transform="rotate(6 105 160)"/><text x="94" y="180" font-size="11" font-family="Bangers" fill="#e63946" transform="rotate(6 105 160)">¡PAGA!</text>`+H(86,166,"#e9b58c")}
+};
+function legs(c){const l=(x,o,k)=>`<g class="${k}">`+(c.pt?`<rect x="${o}" y="180" width="28" height="108" rx="8" fill="${c.pt}" ${S}/>`:"")+`<ellipse cx="${x}" cy="289" rx="17" ry="7" fill="#2b1d14" ${S}/></g>`;return l(50,40,"lgL")+l(90,72,"lgR")}
+function arms(c){return c.ar.map(([x,y,h],i)=>{const sx=i?108:32,d=`M${sx} 128L${x} ${y}`;return `<g class="${i?'aR':'aL'}"><path d="${d}" stroke="#1d1a2b" stroke-width="20" stroke-linecap="round" fill="none"/><path d="${d}" stroke="${c.sl}" stroke-width="15" stroke-linecap="round" fill="none"/>${h?H(x,y+4,c.sk):""}</g>`}).join("")}
+function svg(k){const c=C[k],q=[...k].reduce((a,ch)=>a+ch.charCodeAt(0),0)%7;
+ const eyes=[60,80].map(x=>`<ellipse cx="${x}" cy="60" rx="5" ry="3.4" fill="#fff" stroke="#1d1a2b" stroke-width="1.5"/>`).join("")+`<g class="pu">`+[60,80].map(x=>dot(x,60,2.2,"#2b1d14")).join("")+`</g>`;
+ return `<svg viewBox="0 0 140 300" data-k="${k}" class="${c.hold?'hold':''}" style="--o:${-(q*.8).toFixed(1)}s;--b:${-(q*.6+1).toFixed(1)}s" role="img" aria-label="${c.n}"><defs><radialGradient id="sh" cx=".32" cy=".3" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#3a1d0a" stop-opacity=".3"/></radialGradient></defs>${legs(c)}<g class="up"><g class="hd">${c.back||""}</g><rect x="60" y="90" width="20" height="28" fill="${c.sk}" ${S}/>${c.body}<path d="M18 206Q12 124 70 112Q128 124 122 206Z" fill="url(#sh)"/><g class="hd"><path d="M46 56Q46 30 70 30Q94 30 94 56Q94 84 70 98Q46 84 46 56Z" fill="${c.sk}" ${S}/><path d="M46 56Q46 30 70 30Q94 30 94 56Q94 84 70 98Q46 84 46 56Z" fill="url(#sh)"/><path d="M54 90Q70 104 86 90Q70 98 54 90Z" fill="#000" opacity=".1"/><ellipse cx="45" cy="62" rx="4" ry="7" fill="${c.sk}" ${S}/><ellipse cx="95" cy="62" rx="4" ry="7" fill="${c.sk}" ${S}/><g class="ey">${eyes}</g><path class="br" d="M54 52q6-4 12-1M74 51q6-3 12 1" fill="none" ${S} stroke-width="2"/><path d="M70 62q-4 10-2 13q3 2 6 0" fill="none" stroke="#1d1a2b" stroke-width="1.8" stroke-linecap="round"/><path class="mu" d="M62 85q8 5 16 0" fill="none" ${S} stroke-width="2"/>${c.front||""}</g>${arms(c)}<g class="pr">${c.props||""}</g></g></svg>`}
+document.querySelectorAll('i[data-c]').forEach(e=>{e.outerHTML=svg(e.dataset.c)});
+const VOZ={rodolfo:"Tenor",mimi:"Soprano",marcello:"Barítono",musetta:"Soprano",colline:"Bajo",schaunard:"Barítono",alcindoro:"Bajo buffo",benoit:"Bajo buffo"};
+document.getElementById('cast').innerHTML=["rodolfo","mimi","marcello","musetta","colline","schaunard","alcindoro","benoit"]
+ .map(k=>`<figure>${svg(k)}<figcaption><b>${C[k].n}</b>${C[k].r}<span class="voz">${VOZ[k]}</span></figcaption></figure>`).join('');
+
+const rots=[-2,1.5,-1,2.5];let n=0;
+document.querySelectorAll('.p').forEach(p=>p.querySelectorAll('.bub').forEach((b,j)=>{b.classList.add((j+n)%2?'b1':'b2');b.style.setProperty('--rot',rots[(n+j)%4]+'deg');n++}));
+function layout(){document.querySelectorAll('.p').forEach(p=>{const pw=p.clientWidth,pr=p.getBoundingClientRect(),P=[];
+ p.querySelectorAll('.bub').forEach(b=>{const sv=p.querySelector('svg[data-k="'+b.dataset.s+'"]');if(!sv)return;
+  const r=sv.getBoundingClientRect(),cx=r.left-pr.left-(parseFloat(getComputedStyle(sv).translate)||0)+r.width/2,head=r.top-pr.top+r.height*8/300;
+  b.style.left='0px';b.style.top='0px';const w=b.offsetWidth,h=b.offsetHeight;
+  let left=Math.max(6,Math.min(pw-w-6,cx-(cx<pw/2?40:w-40))),top=head-h-26;
+  const q=P.find(o=>left<o.l+o.w+8&&left+w+8>o.l&&top<o.t+o.h+8&&top+h+8>o.t);
+  if(q){const L=cx>q.cx?q.l+q.w+8:q.l-w-8;if(L>=6&&L+w<=pw-6&&Math.abs(cx-(L+w/2))<w/2-14)left=L;else top=q.t-h-14}
+  top=Math.max(40,top);
+  const t=Math.max(22,Math.min(w-22,cx-left));
+  b.style.left=left+'px';b.style.top=top+'px';b.style.setProperty('--t',t+'px');b.classList.toggle('r',t>w/2);P.push({l:left,w:w,t:top,h:h,cx:cx})})})}
+document.documentElement.classList.add('js');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const attic=(sky,fire,wall)=>`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="${wall}"/><path d="M0 0H400V50L0 90Z" fill="#0003"/><path d="M60 0V300M130 0V300M270 0V300M340 0V300" stroke="#0002" stroke-width="2"/><path d="M150 200V120A50 50 0 0 1 250 120V200Z" fill="${sky}"/><path d="M150 200V172L172 156L192 172L214 150L250 176V200Z" fill="#0f1433"/><circle cx="224" cy="104" r="11" fill="#fff8d6" opacity=".9"/><path d="M150 200V120A50 50 0 0 1 250 120V200ZM200 70V200M150 135H250" fill="none" stroke="#3b2a1d" stroke-width="6"/><rect x="140" y="198" width="120" height="8" fill="#3b2a1d"/><rect x="300" y="140" width="52" height="86" rx="6" fill="#3a3a44"/><rect x="310" y="172" width="32" height="22" rx="3" fill="${fire}"/><rect x="320" y="90" width="12" height="52" fill="#3a3a44"/><path d="M36 230L56 130L76 230M56 130V230" stroke="#3b2a1d" stroke-width="5" fill="none"/><rect x="40" y="142" width="32" height="42" fill="#fffdf5"/><path d="M46 172q8-14 16 0" stroke="#2a4d8f" stroke-width="3" fill="none"/></svg>`;
+const aw=[...Array(8)].map((_,i)=>`<path d="M${124+19*i} 92L${110+22.5*i} 120H${132.5+22.5*i}L${143+19*i} 92Z" fill="${i%2?'#fffdf5':'#c1121f'}"/>`).join('');
+const bulbs=[...Array(8)].map((_,i)=>{const t=.08+i*.12;return `<circle cx="${400*t}" cy="${50+80*t*(1-t)}" r="4" fill="#ffe27a"/>`}).join('');
+const cafe=`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="#1b1f4a"/><circle cx="330" cy="34" r="16" fill="#fff3c4"/><rect y="60" width="120" height="240" fill="#6e3f33"/><rect x="280" y="50" width="120" height="250" fill="#5b3a4a"/><g fill="#ffd966"><rect x="16" y="84" width="22" height="30"/><rect x="60" y="84" width="22" height="30"/><rect x="16" y="140" width="22" height="30"/><rect x="60" y="140" width="22" height="30"/><rect x="304" y="76" width="22" height="30"/><rect x="350" y="76" width="22" height="30"/><rect x="304" y="132" width="22" height="30"/><rect x="350" y="132" width="22" height="30"/></g><rect x="120" y="120" width="160" height="180" fill="#3a2530"/><rect x="132" y="150" width="136" height="90" fill="#ffcf66" opacity=".85"/>${aw}<text x="200" y="112" text-anchor="middle" font-family="Bangers,Impact" font-size="15" fill="#ffd23f" stroke="#1d1a2b" stroke-width=".6">CAFÉ MOMUS</text><path d="M0 50Q200 130 400 50" fill="none" stroke="#111" stroke-width="1.5"/>${bulbs}</svg>`;
+const bars=[...Array(13)].map((_,i)=>`M${126+i*12} 130V252`).join('');
+const gate=`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fa0c4"/><stop offset=".7" stop-color="#f3c9a6"/></linearGradient></defs><rect width="400" height="300" fill="url(#gd)"/><circle cx="200" cy="170" r="34" fill="#ffe7c2" opacity=".9"/><rect x="30" y="100" width="90" height="170" fill="#8e8e9c"/><path d="M22 100L75 62L128 100Z" fill="#5d5d6e"/><rect x="62" y="150" width="26" height="46" fill="#3a3a4a"/><rect x="280" y="100" width="90" height="170" fill="#8e8e9c"/><path d="M272 100L325 62L378 100Z" fill="#5d5d6e"/><rect x="312" y="150" width="26" height="46" fill="#3a3a4a"/><path d="${bars}M120 150H280M120 232H280" stroke="#2a2a33" stroke-width="3"/><path d="M4 280L20 150M20 190L46 168M20 160L-2 138M396 280L380 150M380 190L354 168" stroke="#3b3b44" stroke-width="5" fill="none"/><ellipse cx="200" cy="300" rx="330" ry="62" fill="#f4f7ff"/></svg>`;
+const BG=[attic('#1f2d5c','#ff8c1a','#7a5a44'),cafe,gate,attic('#c9772e','#55555c','#6a5a52')];
+document.querySelectorAll('.act').forEach((a,i)=>a.querySelectorAll('.p').forEach(p=>{p.classList.add('a'+(i+1));
+ p.insertAdjacentHTML('afterbegin','<div class="stage">'+BG[i]+'</div>');
+ p.insertAdjacentHTML('beforeend','<div class="cur l"></div><div class="cur r"></div><div class="val"></div><div class="hint">🎭 Pasa por aquí</div>')}));
+document.querySelectorAll('svg[data-k]').forEach(sv=>{const pr=sv.querySelector('.pr'),sr=sv.getBoundingClientRect(),aL=sv.querySelector('.aL'),aR=sv.querySelector('.aR');if(!sr.width)return;
+ [...pr.children].forEach(e=>{const r=e.getBoundingClientRect(),x=(r.left+r.width/2-sr.left)/sr.width*140;(x<62?aL:x>78?aR:pr).appendChild(e)})});
+const PL=[...document.querySelectorAll('.p')];
+const PLAN={1:[['benoit',1500,'L'],['marcello',900,'hi']],2:[['mimi',900,'hi']],3:[['rodolfo',900,.12],['mimi',900,-.12]],4:[['rodolfo',900,'hi']],
+5:[['musetta',600,'hi'],['alcindoro',1600,'R']],6:[['musetta',700,'hi'],['marcello',1200,'hi']],7:[['marcello',900,'hi']],
+9:[['rodolfo',900,.18],['mimi',900,-.18]],10:[['marcello',1100,-.45],['musetta',1100,.45]],12:[['rodolfo',900,-.2],['musetta',700,'hi']],
+13:[['musetta',600,'hi'],['colline',1700,'L']],14:[['rodolfo',900,.15],['mimi',900,-.15]]};
+function later(p,f,ms){(p._t=p._t||[]).push(setTimeout(f,ms))}
+function mv(p,sv,to,delay,dur){const pr=p.getBoundingClientRect(),r=sv.getBoundingClientRect(),w=r.width,x0=r.left-(parseFloat(getComputedStyle(sv).translate)||0);
+ const off=v=>v==='L'?-(x0-pr.left+w+20):v==='R'?pr.right-x0+20:v*w,from=sv._x;
+ sv.animate([{translate:off(from)+'px 0'},{translate:off(to)+'px 0'}],{duration:dur,delay:delay,fill:'both',easing:'ease-in-out'});
+ later(p,()=>sv.classList.add('walk'),delay);later(p,()=>sv.classList.remove('walk'),delay+dur);sv._x=to}
+function play(p){const svs=[...p.querySelectorAll('.chars svg')],n=svs.length,base=1100;
+ svs.forEach((sv,i)=>{sv._x=i<n/2?'L':'R';mv(p,sv,0,base+i*250,1700)});
+ const arr=base+(n-1)*250+1700;
+ (PLAN[PL.indexOf(p)]||[]).forEach(([k,ms,a])=>{const sv=p.querySelector('svg[data-k="'+k+'"]');if(!sv)return;
+  if(a==='hi')later(p,()=>{sv.classList.add('hi');later(p,()=>sv.classList.remove('hi'),2500)},arr+ms);
+  else mv(p,sv,a,arr+ms,a==='L'||a==='R'?1800:900)});
+ p.querySelectorAll('.bub').forEach((b,j)=>b.style.transitionDelay=(arr+300+j*1400)+'ms')}
+function stop(p){(p._t||[]).forEach(clearTimeout);p._t=[];p.querySelectorAll('.chars svg').forEach(sv=>{sv.getAnimations().forEach(a=>a.cancel());sv.classList.remove('walk','hi')})}
+function open(p){p._o=1;p.title='Pulsa para repetir la escena';p.classList.add('open');if(!RM)play(p)}
+if(RM)PL.forEach(p=>p.classList.add('open','vis'));
+else{const io=new IntersectionObserver(es=>es.forEach(e=>{const p=e.target;p.classList.toggle('vis',e.isIntersecting);}),{threshold:[0,.4]});PL.forEach(p=>io.observe(p));
+ PL.forEach(p=>{p.title='Pasa por encima para abrir el telón';p.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&!p._o)open(p)});p.addEventListener('click',e=>{if(e.target.closest('a,audio'))return;if(!p._o){open(p);return}stop(p);p.classList.add('nt');p.classList.remove('open');void p.offsetWidth;p.classList.remove('nt');setTimeout(()=>open(p),150)})})}
+layout();addEventListener('resize',layout);addEventListener('load',layout);if(document.fonts)document.fonts.ready.then(layout);
+</script></body></html>
