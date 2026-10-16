@@ -36,7 +36,7 @@ h1,h2,.sfx{font-family:Bangers,Impact,sans-serif;font-weight:400;letter-spacing:
 .bub.b2{border-radius:48%/62% 58% 42% 38%;padding:12px 20px}
 .bub:after{content:"";position:absolute;top:calc(100% - 4px);left:var(--t,34px);margin-left:-9px;width:16px;height:26px;background:#fff;border:3px solid var(--ink);border-top:0;border-left:0;border-radius:0 0 100% 0;transform:skewX(-24deg)}
 .bub.r:after{transform:scaleX(-1) skewX(-24deg)}
-.sfx{position:absolute;left:8px;bottom:96px;color:var(--red);font-size:30px;text-shadow:2px 2px 0 var(--ink);z-index:0;transform:rotate(-8deg)}
+.sfx{position:absolute;left:15%;bottom:96px;color:var(--red);font-size:30px;text-shadow:2px 2px 0 var(--ink);z-index:8;transform:rotate(-8deg)}
 .music{margin-top:12px;background:var(--paper);border:3px solid var(--ink);padding:8px 12px}
 .music h3{margin:0 0 4px;font:400 24px Bangers;color:var(--blue)}
 .track{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 0;border-top:2px dotted var(--ink)}
@@ -72,14 +72,14 @@ a:focus-visible,audio:focus-visible{outline:3px solid var(--red)}
 .a1,.a4{--fl:#6b4529;--pl:rgba(0,0,0,.28)}.a2{--fl:#4d4d5c;--pl:rgba(0,0,0,.3)}.a3{--fl:#e6edf7;--pl:rgba(70,100,150,.2)}
 .chars{background:linear-gradient(rgba(255,255,255,.3) 0 3px,transparent 3px) left bottom/100% 30px no-repeat,repeating-linear-gradient(90deg,var(--pl,#0003) 0 2px,transparent 2px 52px) left bottom/100% 30px no-repeat,linear-gradient(var(--fl,#6b4529),var(--fl,#6b4529)) left bottom/100% 30px no-repeat}
 .cap{position:relative;z-index:9}.bub{z-index:7}
-.cur{position:absolute;top:0;bottom:0;width:52%;z-index:4;background:linear-gradient(90deg,rgba(0,0,0,.35),transparent 18%,rgba(255,255,255,.14) 40%,transparent 55%,rgba(0,0,0,.3)),repeating-linear-gradient(90deg,#9e0b1a 0 12px,#d0202f 12px 24px,#7a0814 24px 32px);transition:transform 1.9s cubic-bezier(.6,.05,.3,1),clip-path 1.9s cubic-bezier(.6,.05,.3,1)}
+.cur{position:absolute;top:0;bottom:0;width:52%;z-index:4;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 28%,rgba(0,0,0,.35) 100%),linear-gradient(90deg,rgba(0,0,0,.4),transparent 16%,rgba(255,255,255,.14) 42%,transparent 58%,rgba(0,0,0,.35)),repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 6px,transparent 6px 21px,rgba(255,255,255,.14) 21px 30px,transparent 30px 43px),repeating-linear-gradient(90deg,#5a050f 0,#a8141f 6px,#e0404b 11px,#b81c28 15px,#6b0612 22px,#5a050f 26px),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");transition:transform 1.9s cubic-bezier(.6,.05,.3,1),clip-path 1.9s cubic-bezier(.6,.05,.3,1)}
 .cur.l{left:0;transform-origin:0 0;clip-path:polygon(0 0,100% 0,100% 25%,100% 50%,100% 60%,100% 80%,100% 100%,0 100%)}
 .cur.r{right:0;transform-origin:100% 0;clip-path:polygon(100% 0,0 0,0 25%,0 50%,0 60%,0 80%,0 100%,100% 100%)}
-.open .cur.l{transform:scaleX(.26);clip-path:polygon(0 0,100% 0,92% 25%,58% 50%,52% 60%,66% 80%,100% 100%,0 100%)}
-.open .cur.r{transform:scaleX(.26);clip-path:polygon(100% 0,0 0,8% 25%,42% 50%,48% 60%,34% 80%,0 100%,100% 100%)}
+.open .cur.l{transform:scaleX(.22);clip-path:polygon(0 0,100% 0,92% 25%,58% 50%,52% 60%,66% 80%,100% 100%,0 100%)}
+.open .cur.r{transform:scaleX(.22);clip-path:polygon(100% 0,0 0,8% 25%,42% 50%,48% 60%,34% 80%,0 100%,100% 100%)}
 .cur::after{content:"";position:absolute;left:0;right:0;top:55%;height:14px;background:linear-gradient(#ffd23f,#b8860b);border-radius:7px;opacity:0;transition:opacity .8s 1.2s}.open .cur::after{opacity:1}
 .nt .cur{transition:none}
-.val{position:absolute;left:0;right:0;top:0;height:36px;z-index:5;background:linear-gradient(#7d0f1f,#7d0f1f) top/100% 20px no-repeat,radial-gradient(circle at 20px 0,#8c1224 17px,transparent 18px) 0 18px/40px 20px repeat-x;border-top:4px solid #ffd23f;filter:drop-shadow(0 3px 2px #0006)}
+.val{position:absolute;left:0;right:0;top:0;height:36px;z-index:5;background:linear-gradient(rgba(255,255,255,.22),transparent 70%) top/100% 20px no-repeat,repeating-linear-gradient(90deg,#5a050f 0,#a8141f 6px,#e0404b 10px,#b81c28 14px,#6b0612 20px) top/100% 20px no-repeat,radial-gradient(circle at 20px 0,#b01826 17px,transparent 18px) 0 18px/40px 20px repeat-x;border-top:4px solid #ffd23f;filter:drop-shadow(0 3px 2px #0006)}
 .js .bub{opacity:0;transition:opacity .5s}.open .bub{opacity:1}
 .p{cursor:pointer}
 .lgL,.lgR{transform-box:view-box}.lgL{transform-origin:54px 186px}.lgR{transform-origin:86px 186px}
@@ -203,7 +203,7 @@ const TRACKS=[
 document.querySelectorAll('.tracks').forEach(el=>{
  const L=TRACKS.filter(x=>x.act==el.dataset.act);
  el.innerHTML=L.map(x=>`<div class="track"><span><b>${x.t}</b><em>${x.d}</em></span><audio controls preload="none" src="${x.f}"></audio></div>`).join('');
- el.querySelectorAll('audio').forEach(au=>au.addEventListener('error',()=>{const t=au.closest('.track');if(t.querySelector('.aerr'))return;t.insertAdjacentHTML('beforeend','<p class="aerr">⚠ No se encuentra <code>'+au.getAttribute('src')+'</code>. La carpeta <code>audio</code> debe estar junto a este HTML (descomprime el zip entero y abre el HTML desde ahí).</p>')}));
+ el.querySelectorAll('audio').forEach(au=>au.addEventListener('error',()=>{const t=au.closest('.track');if(t.querySelector('.aerr'))return;t.insertAdjacentHTML('beforeend','<p class="aerr">⚠ No se encuentra <code>'+new URL(au.getAttribute('src'),location.href).href+'</code>. La carpeta <code>audio</code> debe estar junto a este HTML (descomprime el zip entero y abre el HTML desde ahí).</p>')}));
 });
 
 /* === Personajes de cómic (SVG) === */
