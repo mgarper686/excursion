@@ -44,6 +44,31 @@ h1 span{display:block;font-style:italic;color:var(--amber)}
 .train{animation:ride 14s linear infinite}
 @keyframes ride{from{transform:translateX(-260px)}to{transform:translateX(1060px)}}
 
+/* ---------- Entrada animada: algo cruza la pantalla y la va destapando (una sola vez) ---------- */
+.intro{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.intro .cover{position:absolute;inset:0;display:grid;place-items:center;text-align:center;animation:wipe 2.8s cubic-bezier(.55,0,.35,1) .5s forwards}
+.intro .mover{position:absolute;left:0;bottom:calc(12% + 14px);transform:translateX(-100%);animation:go 2.8s cubic-bezier(.55,0,.35,1) .5s forwards}
+@keyframes wipe{0%{clip-path:inset(0 0 0 0)}70%,100%{clip-path:inset(0 0 0 100%);visibility:hidden}}
+@keyframes go{0%{left:0}70%{left:100%}100%{left:calc(100% + 420px);visibility:hidden}}
+.intro .ground{position:absolute;left:0;right:0;bottom:0;height:calc(12% + 14px)}
+.intro .cover h2{margin:0;font-size:clamp(2.2rem,8vw,4.6rem);line-height:1;padding:0 20px}
+.intro .cover h2::after{display:none}
+.intro .cover p{font-weight:700;letter-spacing:.18em;font-size:.8rem;margin-top:12px}
+@media (prefers-reduced-motion:reduce){.intro{display:none}}
+/* Riotinto: el tren minero cruza sobre las vías */
+.intro .cover{background:linear-gradient(180deg,#240d0c,#5a1f1a)}
+.intro .cover h2{font-family:var(--serif);font-weight:800;color:var(--amber);text-shadow:0 4px 30px #000a}
+.intro .cover p{color:#ffd9c9}
+.intro .ground{background:
+  linear-gradient(#8a8f93,#8a8f93) 0 14px/100% 3px no-repeat,
+  repeating-linear-gradient(90deg,#4a2d1f 0 8px,transparent 8px 30px) 0 17px/100% 12px no-repeat,
+  linear-gradient(#150c0b,#150c0b) 0 29px/100% 100% no-repeat}
+.intro .mover{bottom:calc(12% - 1px)}
+.intro .mover svg{display:block;overflow:visible}
+.intro .puff{animation:puff 1s ease-out infinite;transform-origin:center}
+.intro .puff.p2{animation-delay:.33s}.intro .puff.p3{animation-delay:.66s}
+@keyframes puff{0%{opacity:.85;transform:translate(0,0) scale(.5)}100%{opacity:0;transform:translate(-26px,-40px) scale(1.5)}}
+
 /* ---------- Datos ---------- */
 .facts{margin-top:26px;position:relative;z-index:3}
 .facts .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -127,6 +152,20 @@ footer b{color:var(--ink)}
 <body>
 
 <header class="hero">
+  <div class="intro" aria-hidden="true"><div class="cover"><div><h2>Minas de Riotinto</h2><p>EL TREN MINERO</p></div><div class="ground"></div></div>
+    <div class="mover"><svg width="400" height="84" viewBox="0 0 400 84" aria-hidden="true">
+      <g fill="#cfd3d6" class="puffs"><circle class="puff" cx="352" cy="14" r="9"/><circle class="puff p2" cx="352" cy="14" r="9"/><circle class="puff p3" cx="352" cy="14" r="9"/></g>
+      <rect x="6" y="34" width="104" height="34" rx="4" fill="#e2562f"/><rect x="6" y="34" width="104" height="8" rx="3" fill="#f2a93b"/>
+      <rect x="116" y="34" width="104" height="34" rx="4" fill="#7fd18b"/><rect x="116" y="34" width="104" height="8" rx="3" fill="#f6e3bd"/>
+      <rect x="108" y="56" width="10" height="4" fill="#14100f"/><rect x="218" y="56" width="10" height="4" fill="#14100f"/>
+      <rect x="226" y="32" width="118" height="38" rx="6" fill="#2a2422"/><rect x="226" y="14" width="48" height="24" rx="4" fill="#3a302c"/>
+      <rect x="236" y="20" width="14" height="12" rx="2" fill="#ffd27a"/><rect x="344" y="52" width="38" height="6" fill="#14100f"/>
+      <rect x="338" y="30" width="22" height="22" rx="4" fill="#f2a93b"/><rect x="346" y="14" width="14" height="20" rx="2" fill="#14100f"/>
+      <polygon points="344,70 382,70 344,52" fill="#14100f"/><circle cx="342" cy="44" r="6" fill="#ffd27a"/>
+      <rect x="226" y="50" width="118" height="6" fill="#f2a93b"/>
+      <g fill="#14100f"><circle cx="34" cy="74" r="9"/><circle cx="84" cy="74" r="9"/><circle cx="144" cy="74" r="9"/><circle cx="194" cy="74" r="9"/><circle cx="252" cy="74" r="10"/><circle cx="296" cy="74" r="10"/><circle cx="332" cy="74" r="8"/></g>
+      <g fill="#8a8f93"><circle cx="34" cy="74" r="3"/><circle cx="84" cy="74" r="3"/><circle cx="144" cy="74" r="3"/><circle cx="194" cy="74" r="3"/><circle cx="252" cy="74" r="3.5"/><circle cx="296" cy="74" r="3.5"/><circle cx="332" cy="74" r="3"/></g>
+    </svg></div></div>
   <div class="wrap">
     <div>
       <span class="kicker">IES LA RÁBIDA · HOSTELERÍA Y TURISMO</span>

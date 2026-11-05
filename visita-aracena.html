@@ -44,6 +44,31 @@ h1 span{display:block;font-style:italic;color:var(--amber)}
 .train{animation:ride 14s linear infinite}
 @keyframes ride{from{transform:translateX(-260px)}to{transform:translateX(1060px)}}
 
+/* ---------- Entrada animada: algo cruza la pantalla y la va destapando (una sola vez) ---------- */
+.intro{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.intro .cover{position:absolute;inset:0;display:grid;place-items:center;text-align:center;animation:wipe 2.8s cubic-bezier(.55,0,.35,1) .5s forwards}
+.intro .mover{position:absolute;left:0;bottom:calc(12% + 14px);transform:translateX(-100%);animation:go 2.8s cubic-bezier(.55,0,.35,1) .5s forwards}
+@keyframes wipe{0%{clip-path:inset(0 0 0 0)}70%,100%{clip-path:inset(0 0 0 100%);visibility:hidden}}
+@keyframes go{0%{left:0}70%{left:100%}100%{left:calc(100% + 420px);visibility:hidden}}
+.intro .ground{position:absolute;left:0;right:0;bottom:0;height:calc(12% + 14px)}
+.intro .cover h2{margin:0;font-size:clamp(2.2rem,8vw,4.6rem);line-height:1;padding:0 20px}
+.intro .cover h2::after{display:none}
+.intro .cover p{font-weight:700;letter-spacing:.18em;font-size:.8rem;margin-top:12px}
+@media (prefers-reduced-motion:reduce){.intro{display:none}}
+/* Aracena: un cerdo ibérico trota por la dehesa */
+.intro .cover{background:linear-gradient(180deg,#f3d58a,#d79a38)}
+.intro .cover h2{font-family:var(--serif);font-weight:800;color:#143a2a}
+.intro .cover p{color:#5a3a12}
+.intro .ground{background:linear-gradient(#5f8f3c,#43702b)}
+.intro .acorn{position:absolute;font-size:1.7rem;opacity:.9}
+.intro .mover{bottom:calc(12% + 7px)}
+.intro .mover svg{display:block;overflow:visible}
+.intro .body{animation:trot .34s ease-in-out infinite alternate}
+@keyframes trot{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+.intro .leg{transform-box:fill-box;transform-origin:50% 0;animation:leg .34s ease-in-out infinite alternate}
+.intro .leg.b{animation-direction:alternate-reverse}
+@keyframes leg{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
+
 /* ---------- Datos ---------- */
 .facts{margin-top:26px;position:relative;z-index:3}
 .facts .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -127,6 +152,25 @@ footer b{color:var(--ink)}
 <body>
 
 <header class="hero">
+  <div class="intro" aria-hidden="true"><div class="cover"><div><h2>Aracena</h2><p>SIERRA DE HUELVA · JAMÓN IBÉRICO</p></div>
+      <span class="acorn" style="left:12%;top:18%" aria-hidden="true">🌰</span><span class="acorn" style="left:84%;top:24%" aria-hidden="true">🌰</span><span class="acorn" style="left:24%;top:66%" aria-hidden="true">🌳</span><span class="acorn" style="left:74%;top:62%" aria-hidden="true">🌳</span>
+      <div class="ground"></div></div>
+    <div class="mover"><svg width="220" height="120" viewBox="0 0 220 120" aria-hidden="true">
+      <g class="legs">
+        <rect class="leg b" x="52" y="84" width="14" height="32" rx="5" fill="#1c1513"/><rect class="leg" x="76" y="84" width="14" height="32" rx="5" fill="#1c1513"/>
+        <rect class="leg" x="132" y="84" width="14" height="32" rx="5" fill="#1c1513"/><rect class="leg b" x="156" y="84" width="14" height="32" rx="5" fill="#1c1513"/>
+      </g>
+      <g class="body">
+        <path d="M18 56C6 52 4 36 16 34" stroke="#2a2220" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="102" cy="62" rx="82" ry="38" fill="#2d2523"/>
+        <ellipse cx="102" cy="82" rx="70" ry="14" fill="#241d1b"/>
+        <ellipse cx="182" cy="68" rx="28" ry="24" fill="#2d2523"/>
+        <ellipse cx="206" cy="78" rx="14" ry="11" fill="#4a3b36"/>
+        <circle cx="203" cy="76" r="2.4" fill="#14100f"/><circle cx="210" cy="80" r="2.4" fill="#14100f"/>
+        <polygon points="164,48 176,28 188,52" fill="#3a2f2b"/>
+        <circle cx="186" cy="62" r="3.4" fill="#f6e3bd"/>
+      </g>
+    </svg></div></div>
   <div class="wrap">
     <div>
       <span class="kicker">IES LA RÁBIDA · HOSTELERÍA Y TURISMO</span>
