@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="config.js"></script>
 <script src="data.js"></script>
+<script src="extras.js"></script>
 <script src="avatars.js"></script>
 <script src="compositores.js"></script>
 <script src="store.js"></script>
@@ -73,6 +74,7 @@
   .opt .sh{width:30px;height:30px;flex:none;display:grid;place-items:center;font-size:20px;background:#ffffff33;border-radius:9px}
   .opt:disabled{cursor:default}.opt.dim{filter:grayscale(.7) brightness(.75);opacity:.6}
   .opt.ok{outline:4px solid #fff;filter:none;opacity:1}.opt.bad{outline:4px solid var(--red);filter:none;opacity:1}
+  .study{background:linear-gradient(135deg,#ffd54a,#ff9f1c);color:#3a2500;border-radius:14px;padding:10px 14px;margin:0 0 10px;font:800 17px/1.25 var(--head);text-align:center;box-shadow:0 4px 0 #b36b00}
   .timer{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:12px 0 2px}.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));transition:width 1s linear}
   .result{text-align:center;padding:16px 0 4px}
   .result .big{font:800 52px var(--head);line-height:1;margin:6px 0}
@@ -108,7 +110,7 @@
 const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
 const SLOT=new URLSearchParams(location.search).get("slot")||"", PKEY="caac_player"+SLOT;
 let me=null; try{ me=JSON.parse(localStorage.getItem(PKEY)||"null"); }catch(e){}
-let state=null, claims={}, players={}, myAnswers={}, duel=null, lastAudioSeq=null, pendingName="", timerInt=null, sel=null;
+let state=null, claims={}, players={}, myAnswers={}, duel=null, lastAudioSeq=null, pendingName="", pendingDoc=false, timerInt=null, sel=null;
 const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
 
 // ---------- audio ----------
@@ -187,9 +189,27 @@ function applyCtl(c){
   else if(c.cmd==="stop"){ stopAll(); audioDone=true; render(); }
 }
 
+// ---------- esquemas que muestra el profesor ----------
+let esqDismissed=null;
+function showEsq(){
+  const e=state&&state.esq; let o=document.getElementById("esq");
+  if(!e||String(e.seq)===esqDismissed||!esquema(e.id)){ if(o) o.remove(); return; }
+  if(o && o.dataset.seq===String(e.seq)) return;
+  if(o) o.remove();
+  const x=esquema(e.id);
+  o=document.createElement("div"); o.id="esq"; o.dataset.seq=String(e.seq);
+  o.style.cssText="position:fixed;inset:0;z-index:60;background:#0a1324f5;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 0 calc(10px + env(safe-area-inset-bottom,0px))";
+  o.innerHTML=`<div style="color:#fff;font:700 18px/1.2 var(--head);padding:6px 16px 8px;text-align:center">${esc(x.titulo)}</div>
+    <div style="flex:1;overflow:auto;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:center"><img src="${x.img}" alt="${esc(x.titulo)}" style="width:max(100%,860px);display:block;background:#fff"></div>
+    <p style="color:#9fb1d0;text-align:center;font-size:13px;margin:6px 16px 0">Desliza o haz zoom con dos dedos · gira el móvil para verlo mejor</p>
+    <button id="esqx" type="button" class="btn ghost" style="margin:8px 16px 0;width:auto">Cerrar</button>`;
+  document.body.appendChild(o);
+  document.getElementById("esqx").onclick=()=>{ esqDismissed=String(e.seq); o.remove(); };
+}
+
 // ---------- arranque ----------
 Store.on("claims",c=>{ claims=c||{}; if(!me||!me.av) renderJoin(); });
-Store.on("state",s=>{ state=s;
+Store.on("state",s=>{ state=s; showEsq();
   if(s&&s.ctl){ if(lastCtlSeq!==null && s.ctl.seq!==lastCtlSeq) applyCtl(s.ctl); lastCtlSeq=s.ctl.seq; }
   render(); });
 Store.on("players",p=>{ players=p||{};
@@ -216,13 +236,15 @@ function renderJoin(){
     <h1>Visita al CAAC 🎧</h1>
     <p class="muted" style="margin:0 0 12px">Escribe tu nombre y toca tu compositor o compositora. Si ya está cogido, podrás retar a un duelo.</p>
     <input id="nm" placeholder="Tu nombre" value="${esc(nm)}" maxlength="24" autocomplete="off">
+    <label style="display:flex;gap:8px;align-items:center;margin:10px 2px 0;font-size:15px;color:var(--muted)"><input type="checkbox" id="doc" ${pendingDoc?"checked":""} style="width:auto"> 👩‍🏫 Soy docente: participo, pero no entro en el ranking</label>
     <h3>Elige tu compositor/a</h3>
     ${avGrid()}
     ${avCard(sel)}
     <button class="btn green" id="go">Entrar como ${esc(avName(sel))}</button>
+    <p class="center" style="margin:12px 0 0"><a href="guia-estudio.pdf" target="_blank" style="color:var(--teal);font-weight:800">📘 Guía de estudio (PDF)</a></p>
     <div class="tip"><span>💡</span><span>Abre esta página en <b>Safari</b> o <b>Chrome</b> (no desde WhatsApp o Instagram) y ponte los auriculares. Al entrar se activa el sonido.</span></div>
     </div>`;
-  $("nm").oninput=e=>pendingName=e.target.value;
+  $("nm").oninput=e=>pendingName=e.target.value; $("doc").onchange=e=>pendingDoc=e.target.checked;
   document.querySelectorAll(".avpick button").forEach(b=>b.onclick=()=>{ sel=b.dataset.k; document.querySelectorAll(".avpick button").forEach(x=>x.setAttribute("aria-checked",x===b)); $("avcard").outerHTML=avCard(sel); $("go").textContent="Entrar como "+avName(sel); });
   $("go").onclick=()=>join(sel);
 }
@@ -232,13 +254,13 @@ async function join(k){
   const id=(me&&me.id)||U.id();
   const got=await Store.transaction("claims/"+k,cur=>cur?undefined:id);
   if(got===id){
-    me={id,name,av:k,joined:true}; localStorage.setItem(PKEY,JSON.stringify(me));
-    await Store.update("players/"+id,{name,av:k,composer:avName(k),score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
+    me={id,name,av:k,joined:true,docente:pendingDoc}; localStorage.setItem(PKEY,JSON.stringify(me));
+    await Store.update("players/"+id,{name,docente:pendingDoc,av:k,composer:avName(k),score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
     location.reload();
   } else {
     if(!await U.ask("«"+avName(k)+"» ya lo tiene otra persona. ¿Quieres retarle? Gana quien acierte antes.","⚔️ Retar")) return;
-    me={id,name,av:null,joined:true}; localStorage.setItem(PKEY,JSON.stringify(me));
-    await Store.update("players/"+id,{name,av:null,composer:null,score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
+    me={id,name,av:null,joined:true,docente:pendingDoc}; localStorage.setItem(PKEY,JSON.stringify(me));
+    await Store.update("players/"+id,{name,docente:pendingDoc,av:null,composer:null,score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
     await Store.set("duels/"+k+"_"+id,{av:k,holder:got,challenger:id,qi:Math.floor(Math.random()*DUELO.length),winner:null,resolved:false,created:Store.now()});
     location.reload();
   }
@@ -304,7 +326,7 @@ function renderNow(phaseKey){
   if(!me.av){ Music.set(null); return renderJoin(); }
   const ph=state?state.phase:"lobby";
   Music.enabled(!(state&&state.musica===false));
-  Music.set(ph==="lobby"?"espera":ph==="ranking"?"ranking":ph==="end"?"podium":null);
+  Music.set(ph==="lobby"?"espera":ph==="end"?"podium":null);
   if(phaseKey!==lastPhaseKey){ const first=lastPhaseKey===""; lastPhaseKey=phaseKey; if(!first && ph!=="audio") stopAll(); }
   if(!state||state.phase==="lobby"){
     const others=Object.values(players).filter(p=>p.av);
@@ -313,6 +335,7 @@ function renderNow(phaseKey){
       <button class="btn ghost" id="test">🔊 Probar el audio</button>
       <p class="muted" style="font-size:13px;margin:6px 0 0">Si no oyes nada: sube el volumen, quita el modo silencio y pulsa el botón.</p>
       <h3>Ya en la sala (${others.length})</h3><div class="roster">${others.map(p=>`<span title="${esc(p.name)}">${avSVG(p.av,34)}</span>`).join("")}</div>
+      <p style="margin:12px 0 0"><a href="guia-estudio.pdf" target="_blank" style="color:var(--teal);font-weight:800">📘 Guía de estudio (PDF): repásala antes de empezar</a></p>
       <button class="btn ghost" id="swap" style="margin-top:14px;font-size:14px">↩ No soy yo / cambiar de persona</button></div>`;
     $("test").onclick=()=>{ unlockAudio(); stopAll(); const t="Hola "+me.name+", el audio funciona."; if(canSpeak) speakTTS(t); };
     $("swap").onclick=async()=>{ if(!await U.ask("¿Salir y entrar como otra persona?","Salir")) return; try{ await Store.set("claims/"+me.av,null); await Store.set("players/"+me.id,null); }catch(e){} localStorage.removeItem(PKEY); location.reload(); };
@@ -334,10 +357,12 @@ function renderNow(phaseKey){
     return;
   }
   if(ph==="question"){
-    const q=s.preguntas[state.q], key=state.stop+"_"+state.q, mine=myAnswers[key];
+    const qs=qAll(s), q=qs[state.q], sur=state.q>=s.preguntas.length, key=state.stop+"_"+state.q, mine=myAnswers[key];
+    if(!q) return;
     $("main").innerHTML=`<div class="card" style="margin-top:14px">
-      <div class="muted" style="font-size:13px;font-weight:600">${esc(s.nombre)} · pregunta ${state.q+1} de ${s.preguntas.length}</div>
-      <div class="dots">${s.preguntas.map((_,k)=>`<i class="${k<state.q?"done":(k===state.q?"on":"")}"></i>`).join("")}</div>
+      <div class="muted" style="font-size:13px;font-weight:600">${sur?"🎲 Pregunta sorpresa · "+esc(s.nombre):esc(s.nombre)+" · pregunta "+(state.q+1)+" de "+s.preguntas.length}</div>
+      ${sur?"":`<div class="dots">${s.preguntas.map((_,k)=>`<i class="${k<state.q?"done":(k===state.q?"on":"")}"></i>`).join("")}</div>`}
+      ${q.estudio?`<div class="study">${esc(E_ESTUDIO)}</div>`:""}
       <div class="q">${esc(q.q)}</div>
       ${mine?"":`<div class="timer"><i id="tbar" style="width:100%"></i></div>`}
       <div class="opts">${q.opciones.map((o,k)=>`<button class="opt ${mine?(k===q.correcta?"ok":(mine.choice===k?"bad":"dim")):""}" style="background:${OCOL[k]}" data-k="${k}" ${mine?"disabled":""}><span class="sh">${SHAPES[k]}</span>${esc(o)}</button>`).join("")}</div>
@@ -359,7 +384,7 @@ async function answer(key,q,k){
   await Store.transaction("players/"+me.id+"/by/"+key.split("_")[0],cur=>(cur||0)+pts);
 }
 function renderRanking(final){
-  const list=Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av);
+  const list=Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av&&!p.docente);
   const sortedL=list.slice().sort((a,b)=>(b.score||0)-(a.score||0)||String(a.name).localeCompare(String(b.name)));
   const pos=sortedL.findIndex(p=>p.id===me.id)+1;
   if(final){
@@ -367,7 +392,7 @@ function renderRanking(final){
     podiumReveal($("main"));
   } else {
     $("main").innerHTML=rankBoard(list,{stop:state.stop,meId:me.id,title:"🏆 Marcador",
-      sub:`Vas <b>${pos}º</b> de ${list.length} · ${esc(P[state.stop].nombre)}`,note:"Espera a que el profesor active la siguiente parada."});
+      sub:(me.docente?`Participas fuera de concurso 👩‍🏫`:`Vas <b>${pos}º</b> de ${list.length}`)+` · ${esc(P[state.stop].nombre)}`,note:"Espera a que el profesor active la siguiente parada."});
     rankAnimate($("main"));
   }
 }

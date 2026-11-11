@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="config.js"></script>
 <script src="data.js"></script>
+<script src="extras.js"></script>
 <script src="avatars.js"></script>
 <script src="compositores.js"></script>
 <script src="store.js"></script>
@@ -47,6 +48,7 @@
   .phase{display:inline-flex;align-items:center;gap:6px;font:700 12px var(--head);letter-spacing:.06em;text-transform:uppercase;color:var(--navy2);background:#1fa5c822;padding:4px 10px;border-radius:8px}
   .muted{color:var(--muted);font-size:14px}
   ul.guion{margin:0;padding-left:0;list-style:none}ul.guion li{padding:7px 10px;border-left:3px solid var(--teal);background:var(--bg);border-radius:0 10px 10px 0;margin:5px 0;font-size:15px}
+  button.btn.xbtn{width:auto;display:inline-block;margin:0;padding:6px 11px;font-size:14px;line-height:1;border-radius:10px;box-shadow:none}
   button.btn{display:block;width:100%;padding:14px;border:0;border-radius:14px;font:800 16px var(--body);cursor:pointer;margin-top:10px;color:#fff;background:var(--teal);box-shadow:0 4px 0 #1685a3}
   .btn.green{background:var(--green);box-shadow:0 4px 0 #0f7a42}.btn.navy{background:var(--navy2);box-shadow:0 4px 0 #0b1a33}.btn.amber{background:var(--amber);color:#2b2000;box-shadow:0 4px 0 #c08d10}.btn.ghost{background:var(--line);color:var(--ink);box-shadow:none}.btn.red{background:var(--red);box-shadow:0 4px 0 #a52f3f}
   .btn:disabled{opacity:.45;cursor:default}
@@ -93,6 +95,10 @@
   .kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
   .kpi div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}.kpi b{display:block;font:800 24px var(--head);color:var(--navy2)}.kpi small{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
   .xbtn{width:auto;margin:0;padding:6px 10px;font-size:13px;box-shadow:none}
+  .study{background:linear-gradient(135deg,#ffd54a,#ff9f1c);color:#3a2500;border-radius:12px;padding:8px 12px;margin:0 0 8px;font:800 15px/1.25 var(--head)}
+  details.more{margin-top:10px;background:var(--bg);border-radius:12px;padding:8px 12px}details.more summary{cursor:pointer;font:700 14px var(--head);color:var(--teal)}
+  .esqrow{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}.esqrow button{flex:0 0 150px;border:3px solid transparent;border-radius:12px;background:var(--bg);padding:0;cursor:pointer;color:var(--ink);text-align:left;overflow:hidden}.esqrow button img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#fff}.esqrow button span{display:block;font:700 12px/1.2 var(--body);padding:5px 7px}.esqrow button.on{border-color:var(--red)}.esqrow button.rec{border-color:var(--amber)}
+  .sur{background:var(--bg);border-radius:12px;padding:8px 12px;margin:8px 0}.sur summary{cursor:pointer;font:700 15px var(--head)}.sur ol{margin:8px 0;padding-left:22px}.sur li.ok{color:var(--green);font-weight:800}.sur .btn{margin-top:6px;padding:10px}
   .ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.ctl .btn{margin:0;padding:12px 6px;font-size:15px}
   .endbar{margin-top:18px;border-top:1px dashed var(--line);padding-top:6px}
   .undo{background:#f5b82e33;border:1px solid #f5b82e88;border-radius:12px;padding:8px 10px;margin:10px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}.undo .btn{width:auto;margin:0;padding:7px 12px;font-size:14px;box-shadow:none}
@@ -145,7 +151,7 @@
 const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
 const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
 let state={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}};
-const DEF={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{},prev:null,ctl:null,musica:true};
+const DEF={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{},prev:null,ctl:null,esq:null,musica:true};
 let players={}, answers={}, hearHere=false, hearMusic=false, twTimer=null, twDone=false, twText="", twI=0, twCps=15, twPaused=false, DUR={};
 const TAUD=new Audio(); TAUD.setAttribute("playsinline","");
 
@@ -172,7 +178,7 @@ function start(){
 function showTab(v){ document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("act",x.dataset.v===v)); document.querySelectorAll(".view").forEach(x=>x.classList.toggle("act",x.id==="v-"+v)); window.scrollTo(0,0); }
 const setState=o=>Store.update("state",o);
 const online=()=>Object.values(players).filter(p=>p.av).length;
-const TRACK={lobby:"espera",ranking:"ranking",end:"podium"};
+const TRACK={lobby:"espera",end:"podium"};
 
 function renderAll(){ renderParada(); renderMap(); renderTiles(); renderRank(); renderBack(); }
 function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
@@ -180,7 +186,7 @@ function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fot
 function ensureDur(id){ if(DUR[id]!==undefined) return; DUR[id]=0; try{ const a=new Audio(); a.preload="metadata"; a.src="audio/"+id+".mp3"; a.onloadedmetadata=()=>{ DUR[id]=a.duration||0; }; }catch(e){} }
 function rowsSala(){
   const now=Store.now(), list=Object.entries(players).map(([id,p])=>Object.assign({id},p));
-  return list.map(p=>`<div class="rk"><span>${(now-(p.last||0))<90000?"🟢":"⚪"}</span>${p.av?avSVG(p.av,32):"❔"}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"sin compositor")}</small></span><span class="sc">${p.score||0}</span><button class="btn red xbtn" data-id="${p.id}" title="Expulsar">✕</button></div>`).join("")||"<p class='muted'>Nadie conectado todavía.</p>";
+  return list.map(p=>`<div class="rk"><span>${(now-(p.last||0))<90000?"🟢":"⚪"}</span>${p.av?avSVG(p.av,32):"❔"}<span class="nm">${esc(p.name)}${p.docente?" 👩‍🏫":""}<small>${p.docente?"docente · fuera del ranking · ":""}${esc(p.composer||"sin compositor")}</small></span><span class="sc">${p.docente?"—":(p.score||0)}</span><button class="btn red xbtn" data-id="${p.id}" title="Expulsar">✕</button></div>`).join("")||"<p class='muted'>Nadie conectado todavía.</p>";
 }
 function bindExpel(root){
   root.querySelectorAll(".xbtn").forEach(b=>b.onclick=async()=>{ const p=players[b.dataset.id]; if(!p) return; if(await U.ask("¿Expulsar a "+p.name+"?","Expulsar")){ if(p.av) await Store.set("claims/"+p.av,null); await Store.set("players/"+b.dataset.id,null);} });
@@ -188,6 +194,23 @@ function bindExpel(root){
 function musicBlock(){
   return `<div class="musicrow"><label><input type="checkbox" id="mStud" ${state.musica!==false?"checked":""}> 🎵 Música en los móviles</label>
     <label><input type="checkbox" id="mHere" ${hearMusic?"checked":""}> y también en este dispositivo</label></div>`;
+}
+function esqBlock(s){
+  const rec=new Set(s.esquemas||[]); const list=(window.ESQUEMAS||[]).slice().sort((a,b)=>(rec.has(b.id)?1:0)-(rec.has(a.id)?1:0));
+  const cur=state.esq&&state.esq.id;
+  return `<h3>🖼 Esquemas para enseñar al alumnado</h3>
+    <div class="esqrow">${list.map(x=>`<button type="button" data-esq="${x.id}" class="${cur===x.id?"on":(rec.has(x.id)?"rec":"")}"><img src="${x.img}" alt=""><span>${rec.has(x.id)?"⭐ ":""}${esc(x.titulo)}</span></button>`).join("")}</div>
+    ${cur?`<p class="muted small" style="margin:0">Los móviles están viendo «${esc((esquema(cur)||{}).titulo||"")}». <button class="btn ghost" id="bHideEsq" style="display:inline-block;width:auto;margin:0;padding:6px 12px;font-size:13px;box-shadow:none">Ocultar</button></p>`:`<p class="muted small" style="margin:0">Toca uno para mostrarlo en todos los móviles (⭐ = recomendado en esta parada).</p>`}`;
+}
+function surBlock(s){
+  if(!(s.sorpresa||[]).length) return "";
+  const n=s.preguntas.length;
+  return `<h3>🎲 Preguntas sorpresa (solo las ves tú)</h3>`+s.sorpresa.map((q,i)=>`<details class="sur"><summary>${esc(q.q)} · ver y decidir</summary>
+    <ol type="A">${q.opciones.map((o,k)=>`<li class="${k===q.correcta?"ok":""}">${esc(o)}${k===q.correcta?" ✓":""}</li>`).join("")}</ol>
+    <button class="btn amber" data-sur="${n+i}">🚀 Lanzarla ahora</button></details>`).join("");
+}
+function ampBlock(s){
+  return (s.ampliado||[]).length?`<details class="more"><summary>📚 Ampliar información (más datos para tu guion)</summary><ul class="guion" style="margin-top:8px">${s.ampliado.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
 }
 function undoBlock(){
   return state.prev?`<div class="undo"><span>¿Te equivocaste de parada?</span><button class="btn ghost" id="bUndo">↩ Volver a «${esc((P[state.prev.stop]||{}).nombre||"anterior")}»</button></div>`:"";
@@ -210,7 +233,8 @@ function renderParada(){
       ${musicBlock()}
       <button class="btn green" id="bStart">▶ Empezar la visita en ${esc(s.nombre)}</button></div>`;
   } else if(ph==="stop"||ph==="audio"){
-    html+=`<h3>Guion para ti</h3><ul class="guion">${s.profesor.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+    html+=`<h3>Guion para ti</h3><ul class="guion">${s.profesor.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${ampBlock(s)}
+      ${esqBlock(s)}${surBlock(s)}
       <h3>Audio para el alumnado</h3>
       <div class="tw" id="tw">${ph==="audio"?esc(twDone?twText:twText.slice(0,Math.floor(twI))):"<span style='opacity:.75'>Pulsa «Reproducir» y aquí verás el texto escribiéndose mientras suena en sus móviles.</span>"}</div>
       <label class="small muted" style="display:block;margin:8px 0"><input type="checkbox" id="hear" style="width:auto" ${hearHere?"checked":""}> Escucharlo también en este dispositivo</label>
@@ -222,21 +246,23 @@ function renderParada(){
           <button class="btn green" id="bQ0" ${twDone?"":"disabled"}>${twDone?"❓ Lanzar pregunta 1":"⏳ Sonando… (o pulsa Parar)"}</button>`}
       <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>`;
   } else if(ph==="question"){
-    const q=s.preguntas[state.q], key=state.stop+"_"+state.q, ans=answers[key]||{};
+    const q=qAll(s)[state.q], sur=state.q>=nQ, key=state.stop+"_"+state.q, ans=answers[key]||{};
+    if(!q){ setState({phase:"stop",q:-1}); return; }
     const counts=q.opciones.map((_,k)=>Object.values(ans).filter(a=>a.choice===k).length);
     const total=Object.keys(ans).length, n=online();
-    html+=`<div class="q">${esc(q.q)}</div>
+    html+=`${q.estudio?`<div class="study">📚 PREGUNTA DE ESTUDIO: no está en el audio</div>`:""}${sur?`<div class="study" style="background:linear-gradient(135deg,#7dd3fc,#38bdf8);color:#082f49">🎲 Pregunta sorpresa</div>`:""}<div class="q">${esc(q.q)}</div>
       ${q.opciones.map((o,k)=>`<div class="opt ${k===q.correcta?"ok":""}" style="background:${OCOL[k]}"><i class="fill" style="width:${total?counts[k]/total*100:0}%"></i><span class="sh">${SHAPES[k]}</span><span style="position:relative">${esc(o)}</span><span class="cnt">${counts[k]}</span></div>`).join("")}
       <p class="muted" style="margin:12px 0 0">Han respondido <b>${total}</b> de ${n}</p>
       <div class="bar"><i style="width:${n?Math.min(100,total/n*100):0}%"></i></div>
-      ${state.q+1<nQ?`<button class="btn green" id="bNextQ">Siguiente pregunta (${state.q+2}/${nQ}) →</button>`:`<button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`}
+      ${sur?`<button class="btn green" id="bBackStop">↩ Volver a la parada</button><button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`
+        :(state.q+1<nQ?`<button class="btn green" id="bNextQ">Siguiente pregunta (${state.q+2}/${nQ}) →</button><button class="btn ghost" id="bRank">🏆 Saltar al ranking</button>`:`<button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`)}
       <button class="btn ghost" id="bRepeat">🔁 Repetir el audio</button>
       <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>`;
   } else if(ph==="ranking"){
-    html+=`<p class="muted" style="margin:10px 0 0">El alumnado está viendo el marcador (con música). Cuando lleguéis a la siguiente parada, pulsa:</p>
+    html+=`<p class="muted" style="margin:10px 0 0">El alumnado está viendo el marcador. Cuando lleguéis a la siguiente parada, pulsa:</p>
       ${state.stop+1<P.length?`<button class="btn green" id="bNextStop">→ Siguiente: ${esc(P[state.stop+1].nombre)}</button>`:`<button class="btn amber" id="bEnd">🏁 Terminar la visita (podio final)</button>`}
       <button class="btn ghost" id="bPick">Elegir otra parada en el plano</button>
-      ${musicBlock()}
+      ${surBlock(s)}${esqBlock(s)}
       <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>
       <div id="tRank"></div>`;
   } else if(ph==="end"){
@@ -259,7 +285,10 @@ function renderParada(){
   on("bResume",()=>setState({phase:"stop",q:-1}));
   on("bReplay",()=>podiumReveal($("tPodium")));
   on("bPick",()=>showTab("plano"));
-  on("bUndo",undoStop);
+  on("bUndo",undoStop); on("bBackStop",()=>setState({phase:"stop",q:-1}));
+  on("bHideEsq",()=>setState({esq:null}));
+  document.querySelectorAll("[data-esq]").forEach(b=>b.onclick=()=>{ const id=b.dataset.esq; setState({esq:(state.esq&&state.esq.id===id)?null:{id,seq:Date.now()}}); });
+  document.querySelectorAll("[data-sur]").forEach(b=>b.onclick=()=>{ launchQ(+b.dataset.sur); });
   const h=$("hear"); if(h) h.onchange=()=>{ hearHere=h.checked; if(!hearHere) stopTeacherAudio(); };
   const ms=$("mStud"); if(ms) ms.onchange=()=>setState({musica:ms.checked});
   const mh=$("mHere"); if(mh) mh.onchange=()=>{ hearMusic=mh.checked; Music.set(hearMusic&&TRACK[ph]?TRACK[ph]:null); };
@@ -268,7 +297,7 @@ function renderParada(){
   if(ph==="end"){ $("tPodium").innerHTML=podiumView(sortedPlayers()); podiumReveal($("tPodium")); }
   if(ph==="audio" && twTimer===null && !twDone) typewriter(s.audio);
 }
-function sortedPlayers(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av); }
+function sortedPlayers(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av&&!p.docente); }
 function finish(){ stopTw(); stopTeacherAudio(); const visited=Object.assign({},state.visited||{}); visited[state.stop]=true; setState({phase:"end",visited,q:-1}); showTab("parada"); }
 
 function launchQ(k){ stopTw(); stopTeacherAudio(); setState({phase:"question",q:k,qStart:Store.now()}); }

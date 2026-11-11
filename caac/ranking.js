@@ -66,7 +66,7 @@
 
   /* ---------- música ---------- */
   const SILENT = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-  const TR = { espera:["audio/musica-espera.mp3",true,.5], ranking:["audio/musica-ranking.mp3",true,.65], podium:["audio/musica-podium.mp3",false,.9] };
+  const TR = { espera:["audio/musica-espera.mp3",true,.55], podium:["audio/musica-podium.mp3",false,.9] };
   const MUS = new Audio(); MUS.preload = "auto"; MUS.setAttribute("playsinline","");
   let want = null, cur = null, doneTrack = null, muted = false, enabled = true, fadeT = null;
   try{ muted = localStorage.getItem("caac_mute")==="1"; }catch(e){}
