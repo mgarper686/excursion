@@ -1,0 +1,99 @@
+TEXTOS DE AUDIO PARA LA VISITA AL CAAC
+Genera un mp3 por parada (voz neuronal en español de España) y guárdalo en la carpeta audio/ con el nombre indicado.
+
+======================================================================
+1. Puerta de Tierra
+Archivo: audio/puerta-tierra.mp3
+----------------------------------------------------------------------
+Estamos en la Puerta de Tierra, la entrada principal del monasterio de Santa María de las Cuevas. Esta zona era la parte pública de la Cartuja: aquí estaban el zaguán, las cuadras, la hospedería y el comedor de pobres. En 1755 el terremoto de Lisboa, y después varias riadas, destruyeron estos edificios, y entre 1756 y 1766 el arquitecto Ambrosio de Figueroa los reconstruyó. Fíjate en la portada: está diseñada como un gran arco de triunfo, con dos cuerpos y un pequeño ático, hecha de piedra y ladrillo. Las dos hornacinas, hoy vacías, tuvieron las estatuas de San Hugo y San Bruno, talladas por Pedro Roldán en 1650. Sobre el arco verás una imagen en mármol de Santa María de las Cuevas, del siglo quince, y arriba del todo el escudo de don Gonzalo de Mena, el arzobispo que fundó este monasterio en el año 1400.
+
+======================================================================
+2. Capilla de Afuera
+Archivo: audio/capilla-afuera.mp3
+----------------------------------------------------------------------
+Esta es la Capilla de Afuera, también llamada Capilla Pública o Capilla de las Mujeres. La construyó Ambrosio de Figueroa entre 1756 y 1766, sobre una antigua ermita destruida por el terremoto de Lisboa de 1755 y por las riadas. Era el único lugar del monasterio abierto a todo el mundo, también a las mujeres, porque en el resto de la Cartuja solo podían entrar los monjes. Alrededor de la capilla estaban el comedor de pobres y la llamada cocina del infierno, donde se daba de comer a los necesitados. Todo esto era el Conjunto de Afuera: la parte pública del monasterio. La vida de los monjes quedaba dentro, tras la Puerta de Cadenas. Esta capilla ha tenido muchos usos: polvorín durante la invasión francesa, iglesia y almacén cuando esto era una fábrica de loza, y Pabellón Real en la Expo del 92. Hoy acoge obras de artistas contemporáneos.
+
+======================================================================
+3. Conjunto de Afuera: Alicia y el hombre-orquesta
+Archivo: audio/conjunto-afuera.mp3
+----------------------------------------------------------------------
+Estamos en el Conjunto de Afuera, la zona semipública del monasterio. Aquí Ambrosio de Figueroa amplió el zaguán para dar cobijo a los pobres que cada día venían a comer. Su comedor se llamaba la cocina de la carne o del infierno, porque en ella se cocinaba carne, un alimento prohibido para los monjes. La Puerta de Cadenas separaba esta zona de la clausura, donde reinaba el silencio. Con la fábrica de Pickman estos edificios se convirtieron en casas de obreros, y para la Expo del 92 se restauraron. Hoy miras dos obras de arte. En la antigua celda del hermano portero, la artista Cristina Lucas instaló en 2009 a Alicia: una figura gigante que ha crecido tanto que saca la cara y el brazo por las ventanas, como en el cuento de Lewis Carroll cuando come el pastel que dice cómeme. La artista habla de las mujeres encerradas en su casa. Y la escultura del hombre-orquesta es de Curro González: un artista cargado de instrumentos frente a la Puerta de la Fama, buscando el éxito. Cuando cruzas esa puerta suena una fanfarria y una cámara te graba: por un momento, el famoso eres tú.
+
+======================================================================
+4. Atrio
+Archivo: audio/atrio.mp3
+----------------------------------------------------------------------
+Este patio es el atrio: el cruce entre varios edificios del monasterio. Enfrente tienes la fachada de la iglesia. A la izquierda estaba la celda del prior, el monje que mandaba; cuando esto fue una fábrica, aquí vivió su dueño, Charles Pickman, y después fue el laboratorio de la loza. A la derecha está la Procuración, donde se llevaban las cuentas, que más tarde fue la casa de la familia Pickman. Fíjate en el pequeño estanque y en la Cruz de los Ladrones, del siglo dieciséis, con una Piedad en la base: estaba en el camino entre Triana y la Cartuja y los caminantes se paraban a rezar ante ella. Mira ahora la fachada de la iglesia. La parte de abajo, de piedra, es de 1419; la de arriba, de ladrillo, de 1523. Tiene un rosetón y azulejos de Triana del siglo dieciséis. Por esta puerta entraban los visitantes importantes, como el rey Felipe II; los monjes entraban desde la clausura. Para la Expo del 92 el arquitecto José Ramón Sierra restauró el atrio y colocó el Memorial de la Arqueología: piezas antiguas del edificio ordenadas por fechas, entre ellas escudos de la Casa de Medinaceli.
+
+======================================================================
+5. Casa del Prior
+Archivo: audio/casa-prior.mp3
+----------------------------------------------------------------------
+Esta era la casa del prior, el monje que dirigía el monasterio. Mientras los demás monjes vivían en celdas pequeñas y austeras, el prior tenía una auténtica casa palaciega. Se entraba desde el atrio por un porche con arcos, y dentro había dos plantas alrededor de un patio con una fuente. Abajo estaban el oratorio, la biblioteca y hasta una cárcel para los monjes rebeldes. Arriba vivían el prior, sus criados y los visitantes importantes: aquí durmieron los reyes Enrique IV y Felipe II. También tenía una huerta privada. En esta casa hubo cuadros de Murillo, Velázquez, Alonso Cano y Zurbarán, los grandes pintores del Siglo de Oro. Y una biblioteca famosa, con más de tres mil doscientos libros, muchos de ellos manuscritos con ilustraciones, que atraía a sabios de toda España. Después de que los monjes se fueran, Charles Pickman convirtió esta casa en su vivienda y en los laboratorios de la fábrica de loza.
+
+======================================================================
+6. Iglesia
+Archivo: audio/iglesia.mp3
+----------------------------------------------------------------------
+Estamos en la iglesia. Se empezó a construir en 1410 gracias al dinero de Per Afán de Ribera, y se terminó en 1419: un templo gótico de una sola nave. En 1523 se amplió con la Capilla de Santa Ana, donde estuvo enterrado Cristóbal Colón. Mira hacia arriba: el techo son bóvedas de crucería, con nervios de piedra que se cruzan. En los puntos donde se cruzan verás unas estrellas de acero: las puso el arquitecto José Ramón Sierra en la restauración de 1992, y recuerdan el escudo de Gonzalo de Mena, el fundador del monasterio. Al fondo, la bóveda del ábside es la más bonita, con sus nervios abriéndose como un abanico. A su derecha está el reloj, con una maquinaria hecha por fray Manuel Navarro en 1817; a su izquierda, un medallón que representa la vida de los monjes. Antiguamente la iglesia se dividía en cuatro partes: los visitantes miraban desde una reja, luego estaban los monjes legos, después los monjes padres, y al fondo, en el presbiterio, las tumbas de la familia Ribera. Cuando esto fue una fábrica, la iglesia sirvió para secar moldes y guardar loza. Hoy es la sala principal del museo.
+
+======================================================================
+7. Capilla de Colón o de Santa Ana
+Archivo: audio/santa-ana.mp3
+----------------------------------------------------------------------
+Esta es la Capilla de Santa Ana, también llamada Capilla de Colón. La construyó en 1507 el prior Diego de Luján. En su cripta estuvieron enterrados, entre 1509 y 1537, Cristóbal Colón, su hermano Diego y su hijo Diego. Colón era muy amigo de un monje de aquí, fray Gaspar de Gorricio, que le ayudó a preparar los argumentos para convencer a los Reyes Católicos de pagar su segundo viaje a América, y que guardó sus documentos en el monasterio. En 1537 los restos de la familia se llevaron a Santo Domingo, en la actual República Dominicana, y en 1899 los que se atribuyen a Cristóbal Colón volvieron a Sevilla: hoy están en la Catedral. Fíjate en la cúpula de media naranja: en las cuatro esquinas, las pechinas, está el escudo del fundador, Gonzalo de Mena. En las paredes hay azulejos de Juan Bautista Pisano, dos de ellos con San Matías y San Juan. En el siglo diecisiete aquí estaba el Cristo de la Clemencia de Martínez Montañés, que ahora está en la Catedral. Cuando esto fue una fábrica, la capilla sirvió de archivo de la loza.
+
+======================================================================
+8. Refectorio
+Archivo: audio/refectorio.mp3
+----------------------------------------------------------------------
+Este es el refectorio, el comedor de los monjes. Pero no comían aquí todos los días: los cartujos comían solos en sus celdas, y solo venían al refectorio los domingos, en las fiestas y en los funerales. Monjes y legos comían separados por un muro con puertas y ventanas, en silencio, mientras uno leía desde el púlpito. Mira el techo: es un artesonado mudéjar de madera de 1588, uno de los mejor conservados de Sevilla, decorado con los escudos de Gonzalo de Mena. En las paredes, los zócalos de azulejos de los siglos dieciséis y diecisiete muestran influencia de talleres italianos y portugueses. Presidiendo la sala estaba el gran cuadro de la Sagrada Cena, de Alonso Vázquez, que hoy está en el Museo de Bellas Artes de Sevilla, junto a otras pinturas atribuidas a Alonso Cano. Cuando esto fue una fábrica, el refectorio se convirtió en la sala bizcochera: el almacén de las piezas de loza ya cocidas, pero todavía sin decorar.
+
+======================================================================
+9. Capilla de la Magdalena
+Archivo: audio/magdalena.mp3
+----------------------------------------------------------------------
+La Capilla de la Magdalena fue lo primero que se construyó del monasterio, a comienzos del siglo quince. A su alrededor se levantaron las primeras celdas de los monjes. Sirvió como iglesia hasta que se terminó la iglesia grande, en 1420, y después como sala de reuniones de los monjes hasta 1454. Es una joya del arte mudéjar: mira las bóvedas, planas y todas de tamaños distintos. En las paredes quedan pinturas muy antiguas: San Cristóbal, Santa Ana con la Virgen y el Niño, y una Magdalena que casi no se ve, en el arco del fondo. En 1588 se le añadió un espacio con una cúpula de ocho lados, decorada en 1605 con yeserías barrocas. Los azulejos con flores y puntas de diamante llevan el escudo de Gonzalo de Mena, el fundador del monasterio, que estuvo enterrado aquí hasta el siglo diecinueve. Durante la invasión francesa la capilla fue una botica, una farmacia; y en la época de la fábrica, el taller donde se decoraba la loza. En la restauración para la Expo del 92 se dejaron a la vista las huellas antiguas de las bóvedas y los azulejos se colocaron en marcos separados.
+
+======================================================================
+10. Claustrillo mudéjar
+Archivo: audio/claustrillo.mp3
+----------------------------------------------------------------------
+Este patio se llama Claustrillo porque es el claustro más pequeño del monasterio. Se construyó en 1454 y es uno de los mejores ejemplos del arte mudéjar en Sevilla, la mezcla del arte cristiano y el musulmán. Fíjate en los materiales: techos de madera, tejas, pilares de ladrillo rojo, columnas de mármol blanco con capiteles en forma de campana que recuerdan a la Alhambra de Granada, y azulejos con dibujos geométricos entrelazados. Este patio era el pasillo que conectaba las zonas comunes: desde aquí los monjes padres iban a la iglesia, a la Sala Capitular, a la Capilla de la Magdalena y al refectorio, sin cruzarse con los legos. Cuando esto fue una fábrica, el patio se conservó casi intacto y daba paso a la carpintería, la sala de pintura y la bizcochera. Debajo del refectorio estaba la bodega, y las antiguas cocinas son hoy la biblioteca del museo. Alrededor del patio verás lápidas y esculturas de personas rezando: son de la familia Ribera, duques de Medinaceli, que ayudaron al monasterio con su dinero y, a cambio, fueron enterrados aquí durante generaciones.
+
+======================================================================
+11. Sala Capitular
+Archivo: audio/sala-capitular.mp3
+----------------------------------------------------------------------
+Esta es la Sala Capitular, construida en 1454 junto al Claustrillo. Aquí se reunían los monjes, y era el único lugar del monasterio donde podían hablar y romper su silencio. Es una de las primeras capillas de estilo renacentista italiano en España: estamos a finales del siglo quince, justo cuando el gótico se va acabando y llegan a Sevilla las nuevas ideas del Renacimiento. Mira la bóveda: es gótica, estrellada, con los nervios cruzándose. En el centro está el escudo de las Cinco Llagas, el emblema de la Casa de Medinaceli. Las figuras talladas en la piedra son de las esculturas renacentistas más antiguas de Sevilla. Los azulejos de la pared son de 1607. Desde 1490 esta sala se convirtió en el panteón de la familia: aquí están los sepulcros de don Pedro Enríquez y de su esposa Catalina de Ribera, y la lápida de su hijo Fadrique. Cuando esto fue una fábrica, la sala se usó como carpintería y los sepulcros se llevaron al Panteón de Sevillanos Ilustres. En 1992 volvieron a su sitio. Hoy es el único espacio del monasterio que sigue siendo sagrado: aquí se celebran misas en memoria de la familia Medinaceli.
+
+======================================================================
+12. De Profundis y Sacristía
+Archivo: audio/profundis-sacristia.mp3
+----------------------------------------------------------------------
+Entramos por la Capilla De Profundis, también llamada Capilla del Sepulcro. Aquí se velaba a los monjes que morían, y también a los miembros de la familia Ribera enterrados en el monasterio. Es la única que queda de las capillas que rodeaban la iglesia. Tenía azulejos, un banco corrido y un pequeño altar con imágenes sobre la muerte. En la fábrica fue un almacén, y en la restauración de 1992 se reconstruyó recordando su aspecto antiguo. Al fondo está la sacristía, construida en 1537. Aquí los monjes preparaban las ceremonias y guardaban los objetos de oro y plata y los relicarios, que se perdieron con la invasión francesa. Mira la cúpula estrellada: recuerda la visión de estrellas que tuvo San Bruno, el fundador de los cartujos. Las yeserías barrocas de las paredes las hizo Pedro Roldán en 1655, y enmarcaban una serie de cuadros de Zurbarán que hoy están en el Museo de Bellas Artes. Al frente estuvo un tríptico de San Juan Bautista, pintado hacia 1450 por Roger van der Weyden, uno de los grandes pintores flamencos: fue un regalo del emperador Carlos V, y hoy está en Berlín. En la época de la fábrica las dos salas fueron almacenes.
+
+======================================================================
+13. Claustrón y la fábrica de Pickman
+Archivo: audio/claustron.mp3
+----------------------------------------------------------------------
+Este es el Claustrón, el claustro grande, el corazón del monasterio. Tenía tres galerías y un gran patio en el centro que servía de cementerio. Alrededor estaban las celdas de los monjes, y cada una era como una casita: abajo el estudio y el taller, arriba el dormitorio y el oratorio, y al fondo un pequeño huerto. En el siglo diecinueve la fábrica de loza arrasó casi todo el claustro medieval y lo llenó de hornos de botella de estilo inglés: hoy se conservan cinco, y la gran chimenea, que son el símbolo de la Cartuja. Charles Pickman era un inglés que vendía loza inglesa en Cádiz, pero cuando subieron los impuestos decidió fabricarla aquí. Compró el monasterio en la desamortización: estaba junto al río y junto a Triana, el barrio de los alfareros. Montó una fábrica moderna donde la loza pasaba por una cadena: preparar la pasta, moldear, una primera cocción, el vidriado, y una segunda cocción que daba brillo a los colores. Luego se embalaba y salía en barco por la Puerta del Río a todo el mundo. En 1871 la loza de la Cartuja fue nombrada proveedora de la Casa Real, y en 1873 Pickman recibió el título de marqués. Entre 1986 y 1992 el arquitecto José Ramón Sierra reconstruyó las galerías y las celdas con muros desnudos y formas sencillas, mezclando lo monástico y lo industrial. Hoy son las salas de exposición del museo.
+
+======================================================================
+14. Memorial del Agua
+Archivo: audio/memorial-agua.mp3
+----------------------------------------------------------------------
+Cuando se restauró el monasterio para la Exposición Universal de 1992, se tomó una decisión: devolverle su aspecto de cartuja, pero sin borrar las huellas de la fábrica ni de las demás épocas. El arquitecto y artista José Ramón Sierra creó tres memoriales que unen el arte contemporáneo con la historia: el Memorial a Pickman, el Memorial de la Arqueología, que ya vimos en el atrio, y este, el Memorial del Agua. Recuerda que el río Guadalquivir marcó la vida del monasterio: casi cada año había inundaciones. Para contarlo, Sierra colocó bajo una lámina de agua trozos originales del edificio: fustes de columnas, basas y capiteles. Es una forma poética de decir que el río y la Cartuja siempre han estado unidos.
+
+======================================================================
+15. Ombú y monumento a Colón
+Archivo: audio/ombu.mp3
+----------------------------------------------------------------------
+Este gigante es un ombú. Parece un árbol, pero en realidad es un arbusto enorme: crece muy rápido, vive muchísimos años y llega a quince metros de altura. Su tronco no tiene anillos, así que nadie puede saber cuántos años tiene. Viene de las llanuras de Argentina y Uruguay. Aguanta las sequías porque su tronco está cargado de agua, y los insectos no lo atacan porque su savia es tóxica. Según la tradición, este ombú lo plantó Hernando Colón, el hijo de Cristóbal Colón, que era un apasionado de la botánica. Es un recuerdo vivo que une el monasterio con América. A su lado está el monumento a Cristóbal Colón. Lo encargó en 1887 la viuda de Pickman, la dueña de la fábrica, para recordar que el almirante vivió un tiempo en este monasterio, que aquí preparó su segundo viaje a América, y que aquí estuvo enterrado entre 1509 y 1537.
+
+======================================================================
+16. Arco de Legos
+Archivo: audio/arco-legos.mp3
+----------------------------------------------------------------------
+Terminamos en el Arco de Legos. Se llama así porque daba paso al claustro donde vivían los hermanos legos. En la Cartuja había dos tipos de religiosos: los padres, dedicados solo a la oración, y los legos, que trabajaban para mantener el monasterio y atender a los padres. Este arco era la frontera entre los dos mundos. Cuando Pickman convirtió el monasterio en fábrica, esa separación desapareció. En la restauración para la Expo del 92 el arco se reconstruyó de nuevo, pero dejando claro que es una pieza moderna. Aquí José Ramón Sierra colocó el tercero de sus memoriales, el Memorial a Pickman: un muestrario de azulejos de distintas épocas, unos del propio monasterio y otros de las casas que la fábrica construyó para sus obreros. Es el resumen perfecto de la visita: en un mismo muro, los azulejos de los monjes y los de la fábrica, las muchas vidas de la Cartuja.
+

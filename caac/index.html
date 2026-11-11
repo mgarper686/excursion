@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visita al CAAC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;800&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="avatars.js"></script>
+<script src="compositores.js"></script>
+<script src="store.js"></script>
+<style>
+  /* Identidad: folleto del CAAC. Marino profundo, turquesa, verde Cartuja y el motivo escalonado del logo. */
+  :root{--navy:#12233f;--navy2:#1b3358;--royal:#2b4fb8;--teal:#1fa5c8;--green:#16a35a;--lime:#39c27a;--amber:#f5b82e;--red:#e14b5e;
+    --bg:#eef2f8;--card:#fff;--ink:#15213a;--muted:#5b6b86;--line:#dbe2ee;
+    --head:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --o1:#e14b5e;--o2:#2b6fe0;--o3:#e8a917;--o4:#1f9d55;--o5:#8a4fd8;--o6:#f0742e}
+  @media (prefers-color-scheme:dark){:root{--bg:#0a1324;--card:#13213a;--ink:#eaf0fb;--muted:#9fb1d0;--line:#243a5e;color-scheme:dark}}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 var(--body)}
+  body{padding-top:env(safe-area-inset-top,0px)}
+  .step{background:repeating-linear-gradient(90deg,var(--teal) 0 14px,transparent 14px 20px,var(--green) 20px 34px,transparent 34px 40px);height:5px}
+  header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:9px 16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px #0003}
+  header .brand{font-family:var(--head);font-weight:700;letter-spacing:.05em;font-size:14px;color:#9fd7e8}
+  header .who{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-weight:600;font-size:15px}
+  header .who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pts{background:var(--amber);color:#2b2000;font-weight:800;border-radius:14px;padding:4px 11px;font-size:14px;font-variant-numeric:tabular-nums}
+  main{max-width:560px;margin:0 auto;padding:0 0 48px}
+  .card{background:var(--card);border-radius:20px;padding:18px;margin:14px 16px;box-shadow:0 6px 24px #0f1c3a12}
+  h1,h2{font-family:var(--head);text-wrap:balance;line-height:1.12}
+  h1{font-size:30px;margin:0 0 6px}h2{font-size:24px;margin:8px 0 4px}
+  h3{margin:14px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-family:var(--head)}
+  .muted{color:var(--muted);font-size:15px}
+  input{width:100%;padding:14px 16px;font:600 18px var(--body);border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink)}
+  input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px #1fa5c833}
+  .btn{display:block;width:100%;padding:16px;border:0;border-radius:14px;font:800 17px var(--body);cursor:pointer;margin-top:12px;color:#fff;background:var(--teal);box-shadow:0 4px 0 #1685a3}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #1685a3}
+  .btn.green{background:var(--green);box-shadow:0 4px 0 #0f7a42}.btn.ghost{background:var(--line);color:var(--ink);box-shadow:none}.btn.navy{background:var(--navy2);box-shadow:0 4px 0 #0b1a33}
+  .btn:disabled{opacity:.45;transform:none}
+  /* hero de parada con foto */
+  .hero{position:relative;margin:0 0 -22px;overflow:hidden;background:var(--navy2)}
+  .hero img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+  .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}.gal img{flex:0 0 100%;scroll-snap-align:start;width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+  .hero .ov{pointer-events:none}.hero .tx{pointer-events:none}
+  .hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,#0000 35%,#12233fdd 100%)}
+  .hero .tx{position:absolute;left:16px;right:16px;bottom:30px;color:#fff}
+  .hero .n{display:inline-block;background:var(--teal);color:#fff;font:700 12px var(--head);letter-spacing:.08em;padding:4px 10px;border-radius:8px;margin-bottom:6px}
+  .hero h2{margin:0;font-size:26px;text-shadow:0 2px 8px #0008}
+  /* avatares */
+  .avpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin-top:10px}
+  .avpick button{position:relative;border:3px solid transparent;background:transparent;border-radius:50%;padding:0;cursor:pointer;line-height:0;transition:transform .12s}
+  .avpick button:active{transform:scale(.92)}
+  .avpick button[aria-checked="true"]{border-color:var(--teal);box-shadow:0 0 0 3px #1fa5c844}
+  .avpick button.taken{opacity:.5;filter:grayscale(.85)}
+  .avpick .lk{position:absolute;right:-4px;bottom:-4px;font-style:normal;font-size:15px;line-height:1}
+  .avcard{display:flex;gap:14px;align-items:center;margin-top:14px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:14px}
+  .avcard .av{flex:none}
+  .avcard b{font-family:var(--head);font-size:19px;display:block}
+  .avcard small{color:#9fd7e8;display:block;margin-bottom:4px;font-weight:600}
+  .avcard p{margin:0;font-size:14px;line-height:1.4;color:#dfe9f7}
+  .big-av{display:flex;justify-content:center;margin:6px 0}
+  .roster{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+  /* preguntas */
+  .q{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;border-radius:18px;padding:18px;font:700 20px/1.3 var(--head)}
+  .opts{display:grid;gap:10px;margin-top:12px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border:0;border-radius:16px;color:#fff;font:700 17px/1.25 var(--body);cursor:pointer;box-shadow:0 4px 0 #0003;transition:transform .1s,filter .2s}
+  .opt:active{transform:translateY(2px)}
+  .opt .sh{width:30px;height:30px;flex:none;display:grid;place-items:center;font-size:20px;background:#ffffff33;border-radius:9px}
+  .opt:disabled{cursor:default}.opt.dim{filter:grayscale(.7) brightness(.75);opacity:.6}
+  .opt.ok{outline:4px solid #fff;filter:none;opacity:1}.opt.bad{outline:4px solid var(--red);filter:none;opacity:1}
+  .timer{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:12px 0 2px}.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));transition:width 1s linear}
+  .result{text-align:center;padding:16px 0 4px}
+  .result .big{font:800 52px var(--head);line-height:1;margin:6px 0}
+  .result .ok{color:var(--green)}.result .no{color:var(--red)}
+  /* ranking */
+  .podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;margin:14px 0 8px}
+  .pod{text-align:center;background:var(--bg);border-radius:14px 14px 6px 6px;padding:10px 6px 8px}
+  .pod .avw{display:flex;justify-content:center}
+  .pod b{display:block;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pod small{color:var(--muted);font-variant-numeric:tabular-nums}
+  .pod.p1{background:linear-gradient(180deg,#f5b82e55,var(--bg));padding-top:16px}.pod.p2{background:linear-gradient(180deg,#9fb1d055,var(--bg))}.pod.p3{background:linear-gradient(180deg,#c9843a55,var(--bg))}
+  .rk{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px}
+  .rk .pos{font:800 18px var(--head);width:28px;color:var(--muted)}
+  .rk .sc{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+  .rk.me{background:#1fa5c822;outline:2px solid var(--teal)}
+  .wave{display:flex;gap:5px;align-items:flex-end;height:44px;justify-content:center;margin:14px 0 6px}
+  .wave i{width:7px;background:var(--teal);border-radius:4px;animation:w 1s infinite ease-in-out}
+  .wave i:nth-child(2){animation-delay:.12s}.wave i:nth-child(3){animation-delay:.24s}.wave i:nth-child(4){animation-delay:.36s}.wave i:nth-child(5){animation-delay:.48s}.wave i:nth-child(6){animation-delay:.6s}
+  @keyframes w{0%,100%{height:10px}50%{height:44px}}
+  @media (prefers-reduced-motion:reduce){.wave i{animation:none;height:24px}}
+  .center{text-align:center}
+  .txt{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.txt summary{cursor:pointer;font-weight:700;color:var(--teal);font-family:var(--head)}.txt p{margin:8px 0 0;line-height:1.55;font-size:16px}
+  .tip{display:flex;gap:8px;align-items:flex-start;background:#f5b82e22;border:1px solid #f5b82e66;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+  .dots{display:flex;gap:4px;justify-content:center;margin:8px 0}.dots i{width:8px;height:8px;border-radius:4px;background:var(--line)}.dots i.on{background:var(--teal);width:20px}.dots i.done{background:var(--green)}
+</style>
+</head>
+<body>
+<header><span class="brand">CAAC</span><div class="who" id="who"><span>Visita al monasterio</span></div><span class="pts" id="hPts" hidden>0</span></header>
+<div class="step"></div>
+<main id="main"></main>
+
+<script>
+const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
+const SLOT=new URLSearchParams(location.search).get("slot")||"", PKEY="caac_player"+SLOT;
+let me=null; try{ me=JSON.parse(localStorage.getItem(PKEY)||"null"); }catch(e){}
+let state=null, claims={}, players={}, myAnswers={}, duel=null, lastAudioSeq=null, pendingName="", timerInt=null, sel=null;
+const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
+
+// ---------- audio ----------
+const canSpeak="speechSynthesis" in window;
+let VOICE=null, curAudio=null;
+// Elige la voz española más natural que tenga el móvil (las "Natural", "Enhanced", "Premium" o de Google suenan mucho mejor).
+function pickVoice(){
+  if(!canSpeak) return null;
+  const vs=speechSynthesis.getVoices(); if(!vs.length) return null;
+  const score=v=>{ let p=0; const n=(v.name||"").toLowerCase(), l=(v.lang||"").toLowerCase().replace("_","-");
+    if(!l.startsWith("es")) return -1;
+    if(l==="es-es") p+=40; else if(l==="es-mx"||l==="es-us"||l==="es-419") p+=20; else p+=10;
+    if(/natural|neural|premium|enhanced|mejorad/.test(n)) p+=50;
+    if(/google/.test(n)) p+=25;
+    if(/m[oó]nica|elvira|alvaro|álvaro|jorge|paulina|marisol|laura|pablo|lucia|lucía|helena|sergio|conchita|esperanza/.test(n)) p+=15;
+    if(/compact|espeak|eloquence/.test(n)) p-=40;
+    if(v.localService===false) p+=5;
+    return p; };
+  return vs.map(v=>[score(v),v]).filter(x=>x[0]>=0).sort((a,b)=>b[0]-a[0]).map(x=>x[1])[0]||null;
+}
+if(canSpeak){ VOICE=pickVoice(); speechSynthesis.onvoiceschanged=()=>{ VOICE=pickVoice(); }; }
+function stopAll(){ if(canSpeak) speechSynthesis.cancel(); if(curAudio){ try{curAudio.pause();}catch(e){} curAudio=null; } }
+// Lee por frases, con una pequeña pausa entre ellas: la entonación queda mucho más natural que de un tirón.
+function speakTTS(text){
+  if(!canSpeak) return; speechSynthesis.cancel();
+  const parts=text.replace(/\s+/g," ").match(/[^.!?…]+[.!?…]+["»”]?|[^.!?…]+$/g)||[text];
+  let i=0;
+  const next=()=>{ if(i>=parts.length) return; const u=new SpeechSynthesisUtterance(parts[i++].trim());
+    u.lang=(VOICE&&VOICE.lang)||"es-ES"; if(VOICE) u.voice=VOICE; u.rate=0.92; u.pitch=1.0; u.volume=1;
+    u.onend=()=>setTimeout(next,260); u.onerror=()=>setTimeout(next,100); speechSynthesis.speak(u); };
+  next();
+}
+// Si existe audio/<id>.mp3 (grabación propia o voz neuronal), suena ese; si no, la voz del móvil.
+function speak(text,id){
+  stopAll();
+  if(id){ const a=new Audio("audio/"+id+".mp3"); curAudio=a; a.onerror=()=>{ if(curAudio===a){ curAudio=null; speakTTS(text); } };
+    a.play().catch(()=>{ if(curAudio===a){ curAudio=null; speakTTS(text); } }); return; }
+  speakTTS(text);
+}
+function unlockAudio(){ if(canSpeak){ try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u);}catch(e){} } }
+
+// ---------- arranque ----------
+Store.on("claims",c=>{ claims=c||{}; if(!me||!me.av) renderJoin(); });
+Store.on("state",s=>{ state=s; render(); });
+Store.on("players",p=>{ players=p||{};
+  if(me && me.joined && !players[me.id]){ localStorage.removeItem(PKEY); me=null; return renderJoin(); }
+  if(me&&players[me.id]){ $("hPts").hidden=false; $("hPts").textContent=players[me.id].score||0; }
+  render(); });
+if(me){ Store.on("answers",a=>{ myAnswers={}; Object.entries(a||{}).forEach(([k,v])=>{ if(v[me.id]) myAnswers[k]=v[me.id]; }); render(); });
+        Store.on("duels",d=>{ duel=null; Object.entries(d||{}).forEach(([k,v])=>{ if(v && !v.resolved && (v.holder===me.id||v.challenger===me.id)) duel=Object.assign({key:k},v); }); render(); });
+        setInterval(()=>Store.update("players/"+me.id,{last:Store.now()}),30000); Store.update("players/"+me.id,{last:Store.now()}); }
+if(!me) renderJoin(); else render();
+
+function headerWho(){ $("who").innerHTML = me&&me.av ? avSVG(me.av,30)+`<span>${esc(me.name)} · ${esc(avName(me.av))}</span>` : `<span>Visita al monasterio</span>`; }
+
+// ---------- entrar: elegir avatar ----------
+function avGrid(){
+  const taken=new Set(Object.keys(claims));
+  return `<div class="avpick" role="radiogroup" aria-label="Compositor o compositora">${ORDEN_COMPOSITORES.map(k=>`<button type="button" role="radio" aria-checked="${k===sel}" data-k="${k}" class="${taken.has(k)?"taken":""}" title="${esc(avName(k))}" aria-label="${esc(avName(k))}${taken.has(k)?", ya elegido: habrá duelo":""}">${avSVG(k,52)}${taken.has(k)?'<i class="lk">⚔️</i>':""}</button>`).join("")}</div>`;
+}
+function avCard(k){ const i=INFO_COMPOSITORES[k]||["",""]; return `<div class="avcard" id="avcard"><div class="av">${avSVG(k,74)}</div><div><b>${esc(avName(k))}</b><small>${esc(i[0])}</small><p>${esc(i[1])}</p></div></div>`; }
+function renderJoin(){
+  if(!sel) sel=ORDEN_COMPOSITORES[Math.floor(Math.random()*ORDEN_COMPOSITORES.length)];
+  const nm=pendingName||($("nm")?$("nm").value:"");
+  $("main").innerHTML=`<div class="card">
+    <h1>Visita al CAAC 🎧</h1>
+    <p class="muted" style="margin:0 0 12px">Escribe tu nombre y toca tu compositor o compositora. Si ya está cogido, podrás retar a un duelo.</p>
+    <input id="nm" placeholder="Tu nombre" value="${esc(nm)}" maxlength="24" autocomplete="off">
+    <h3>Elige tu compositor/a</h3>
+    ${avGrid()}
+    ${avCard(sel)}
+    <button class="btn green" id="go">Entrar como ${esc(avName(sel))}</button>
+    <div class="tip"><span>💡</span><span>Abre esta página en <b>Safari</b> o <b>Chrome</b> (no desde WhatsApp o Instagram) y ponte los auriculares. Al entrar se activa el sonido.</span></div>
+    </div>`;
+  $("nm").oninput=e=>pendingName=e.target.value;
+  document.querySelectorAll(".avpick button").forEach(b=>b.onclick=()=>{ sel=b.dataset.k; document.querySelectorAll(".avpick button").forEach(x=>x.setAttribute("aria-checked",x===b)); $("avcard").outerHTML=avCard(sel); $("go").textContent="Entrar como "+avName(sel); });
+  $("go").onclick=()=>join(sel);
+}
+async function join(k){
+  const name=($("nm").value||"").trim(); if(!name) return U.alert("Escribe tu nombre");
+  unlockAudio();
+  const id=(me&&me.id)||U.id();
+  const got=await Store.transaction("claims/"+k,cur=>cur?undefined:id);
+  if(got===id){
+    me={id,name,av:k,joined:true}; localStorage.setItem(PKEY,JSON.stringify(me));
+    await Store.update("players/"+id,{name,av:k,composer:avName(k),score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
+    location.reload();
+  } else {
+    if(!await U.ask("«"+avName(k)+"» ya lo tiene otra persona. ¿Quieres retarle? Gana quien acierte antes.","⚔️ Retar")) return;
+    me={id,name,av:null,joined:true}; localStorage.setItem(PKEY,JSON.stringify(me));
+    await Store.update("players/"+id,{name,av:null,composer:null,score:(players[id]&&players[id].score)||0,joined:Store.now(),last:Store.now()});
+    await Store.set("duels/"+k+"_"+id,{av:k,holder:got,challenger:id,qi:Math.floor(Math.random()*DUELO.length),winner:null,resolved:false,created:Store.now()});
+    location.reload();
+  }
+}
+
+// ---------- duelo ----------
+function renderDuel(){
+  headerWho();
+  if(duel.winner) return resolveDuel();
+  const q=DUELO[duel.qi], other=players[duel.holder===me.id?duel.challenger:duel.holder];
+  $("main").innerHTML=`<div class="card"><div class="center">${avSVG(duel.av,84)}</div><h2 class="center">⚔️ Duelo por ${esc(avName(duel.av))}</h2>
+    <p class="muted center">Contra <b>${esc(other?other.name:"…")}</b>. Quien acierte antes se lo queda.</p>
+    <div class="q">${esc(q.q)}</div>
+    <div class="opts">${q.opciones.map((o,k)=>`<button class="opt" style="background:${OCOL[k]}" data-k="${k}"><span class="sh">${SHAPES[k]}</span>${esc(o)}</button>`).join("")}</div>
+    ${duel.challenger===me.id?`<button class="btn ghost" id="cancelDuel">Cancelar y elegir otro</button>`:""}</div>`;
+  const cd=$("cancelDuel"); if(cd) cd.onclick=async()=>{ await Store.set("duels/"+duel.key,null); duel=null; render(); };
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
+    document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+    if(+b.dataset.k===q.correcta){ const w=await Store.transaction("duels/"+duel.key+"/winner",cur=>cur?undefined:me.id); b.classList.add(w===me.id?"ok":"bad"); }
+    else { b.classList.add("bad"); setTimeout(()=>{ document.querySelectorAll(".opt").forEach(x=>x.disabled=false); b.classList.remove("bad"); },1500); }
+  });
+}
+async function resolveDuel(){
+  const won=duel.winner===me.id, k=duel.av;
+  await Store.update("duels/"+duel.key,{resolved:true});
+  if(won){
+    await Store.set("claims/"+k,me.id); me.av=k; localStorage.setItem(PKEY,JSON.stringify(me));
+    await Store.update("players/"+me.id,{av:k,composer:avName(k)});
+    $("main").innerHTML=`<div class="card result"><div class="big">🏆</div><h2>¡Has ganado el duelo!</h2><p class="muted">${esc(avName(k))} es tuyo/a.</p></div>`;
+  } else {
+    if(duel.holder===me.id){ me.av=null; localStorage.setItem(PKEY,JSON.stringify(me)); await Store.update("players/"+me.id,{av:null,composer:null}); }
+    $("main").innerHTML=`<div class="card result"><div class="big">😅</div><h2>Has perdido el duelo</h2><p class="muted">Elige otro compositor o compositora.</p></div>`;
+  }
+  setTimeout(()=>location.reload(),1800);
+}
+
+// ---------- vista principal ----------
+function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
+function render(){
+  if(!me) return;
+  headerWho();
+  if(duel) return renderDuel();
+  if(!me.av) return renderJoin();
+  if(!state||state.phase==="lobby"){
+    const others=Object.values(players).filter(p=>p.av);
+    $("main").innerHTML=`<div class="card center"><div class="big-av">${avSVG(me.av,120)}</div><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el profesor empiece la visita. Ponte los auriculares.</p>
+      <button class="btn ghost" id="test">🔊 Probar el audio</button>
+      <h3>Ya en la sala (${others.length})</h3><div class="roster">${others.map(p=>`<span title="${esc(p.name)}">${avSVG(p.av,34)}</span>`).join("")}</div></div>`;
+    $("test").onclick=()=>speak("Hola "+me.name+", el audio funciona.");
+    return;
+  }
+  const s=P[state.stop]; if(!s) return;
+  const ph=state.phase;
+  if(ph==="stop"||ph==="audio"){
+    if(ph==="audio" && state.audioSeq!==lastAudioSeq){ lastAudioSeq=state.audioSeq; speak(s.audio,s.id); }
+    $("main").innerHTML=hero(s)+`<div class="card">
+      ${ph==="audio"?`<div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="muted center" style="margin:0">Escucha con tus auriculares. Después habrá preguntas.</p>
+        <button class="btn ghost" id="again">🔁 Volver a escuchar</button>
+        <details class="txt" ${state.audioSeq>1?"open":""}><summary>📖 ¿No lo oyes? Léelo aquí</summary><p>${esc(s.audio)}</p></details>`
+        :`<p class="muted center" style="margin:4px 0">📍 Estamos aquí. Escucha al profesor; enseguida sonará el audio en tu móvil.</p>`}</div>`;
+    const a=$("again"); if(a) a.onclick=()=>speak(s.audio,s.id);
+    return;
+  }
+  if(ph==="question"){
+    const q=s.preguntas[state.q], key=state.stop+"_"+state.q, mine=myAnswers[key];
+    $("main").innerHTML=`<div class="card" style="margin-top:14px">
+      <div class="muted" style="font-size:13px;font-weight:600">${esc(s.nombre)} · pregunta ${state.q+1} de ${s.preguntas.length}</div>
+      <div class="dots">${s.preguntas.map((_,k)=>`<i class="${k<state.q?"done":(k===state.q?"on":"")}"></i>`).join("")}</div>
+      <div class="q">${esc(q.q)}</div>
+      ${mine?"":`<div class="timer"><i id="tbar" style="width:100%"></i></div>`}
+      <div class="opts">${q.opciones.map((o,k)=>`<button class="opt ${mine?(k===q.correcta?"ok":(mine.choice===k?"bad":"dim")):""}" style="background:${OCOL[k]}" data-k="${k}" ${mine?"disabled":""}><span class="sh">${SHAPES[k]}</span>${esc(o)}</button>`).join("")}</div>
+      ${mine?`<div class="result"><div class="big ${mine.correct?"ok":"no"}">${mine.correct?"+"+mine.points:"0"}</div><p class="muted">${mine.correct?"¡Correcto! Espera a la siguiente pregunta…":"Esta vez no. Espera a la siguiente pregunta…"}</p></div>`:""}</div>`;
+    if(!mine){
+      const secs=CONFIG.segundosRespuesta||20; clearInterval(timerInt);
+      timerInt=setInterval(()=>{ const el=$("tbar"); if(!el){clearInterval(timerInt);return;} const f=1-Math.min(1,(Store.now()-state.qStart)/(secs*1000)); el.style.width=(f*100)+"%"; },500);
+      document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(key,q,+b.dataset.k));
+    }
+    return;
+  }
+  if(ph==="ranking"||ph==="end") return renderRanking(ph==="end");
+}
+async function answer(key,q,k){
+  document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+  const correct=k===q.correcta, pts=U.points(correct,Store.now()-state.qStart);
+  await Store.set("answers/"+key+"/"+me.id,{choice:k,correct,points:pts,t:Store.now()});
+  await Store.transaction("players/"+me.id+"/score",cur=>(cur||0)+pts);
+}
+function renderRanking(final){
+  const list=Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av).sort((a,b)=>(b.score||0)-(a.score||0));
+  const pos=list.findIndex(p=>p.id===me.id)+1;
+  const pod=i=>list[i]?`<div class="pod p${i+1}"><div class="avw">${avSVG(list[i].av,i===0?64:50)}</div><b>${esc(list[i].name)}</b><small>${list[i].score||0}</small></div>`:`<div></div>`;
+  $("main").innerHTML=`<div class="card"><h2 class="center">${final?"🏁 Ranking final":"🏆 Ranking"}</h2>
+    <p class="muted center" style="margin:0">Vas en la posición <b>${pos}</b> de ${list.length}.${final?"":" Espera a que el profesor active la siguiente parada."}</p>
+    <div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>
+    ${list.slice(3,12).map((p,i)=>`<div class="rk ${p.id===me.id?"me":""}"><span class="pos">${i+4}</span>${avSVG(p.av,32)}<span>${esc(p.name)}</span><span class="sc">${p.score||0}</span></div>`).join("")}
+    ${pos>12?`<div class="rk me"><span class="pos">${pos}</span>${avSVG(me.av,32)}<span>${esc(me.name)}</span><span class="sc">${players[me.id]?players[me.id].score||0:0}</span></div>`:""}</div>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CAAC · Profesor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;800&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="avatars.js"></script>
+<script src="compositores.js"></script>
+<script src="store.js"></script>
+<style>
+  :root{--navy:#12233f;--navy2:#1b3358;--royal:#2b4fb8;--teal:#1fa5c8;--green:#16a35a;--amber:#f5b82e;--red:#e14b5e;
+    --bg:#eef2f8;--card:#fff;--ink:#15213a;--muted:#5b6b86;--line:#dbe2ee;
+    --head:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --o1:#e14b5e;--o2:#2b6fe0;--o3:#e8a917;--o4:#1f9d55;--o5:#8a4fd8;--o6:#f0742e}
+  @media (prefers-color-scheme:dark){:root{--bg:#0a1324;--card:#13213a;--ink:#eaf0fb;--muted:#9fb1d0;--line:#243a5e;color-scheme:dark}}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body)}
+  body{padding-top:env(safe-area-inset-top,0px)}
+  header{background:var(--navy);color:#fff;padding:9px 14px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px #0003}
+  header h1{margin:0;font:700 15px var(--head);flex:1;letter-spacing:.03em}header h1 b{color:#9fd7e8}
+  .pill{font-size:12px;padding:4px 10px;border-radius:12px;background:#ffffff22;font-weight:600}
+  .pill.on{background:var(--green)}
+  .step{background:repeating-linear-gradient(90deg,var(--teal) 0 14px,transparent 14px 20px,var(--green) 20px 34px,transparent 34px 40px);height:5px}
+  nav.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:47px;z-index:9}
+  nav.tabs button{flex:1;padding:11px 4px;border:0;background:none;color:var(--muted);font:700 13px var(--head);border-bottom:3px solid transparent;cursor:pointer}
+  nav.tabs button.act{color:var(--teal);border-color:var(--teal)}
+  main{max-width:780px;margin:0 auto;padding:0 0 60px}
+  .view{display:none}.view.act{display:block}
+  .card{background:var(--card);border-radius:20px;padding:16px;margin:14px 14px;box-shadow:0 6px 24px #0f1c3a12}
+  .hero{position:relative;overflow:hidden;border-radius:20px 20px 0 0;background:var(--navy2);margin:-16px -16px 12px}
+  .hero img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+  .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}.gal img{flex:0 0 100%;scroll-snap-align:start;width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+  .hero .ov{pointer-events:none}.hero .tx{pointer-events:none}
+  .hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,#0000 30%,#12233fe6 100%)}
+  .hero .tx{position:absolute;left:16px;right:16px;bottom:14px;color:#fff}
+  .hero .n{display:inline-block;background:var(--teal);font:700 12px var(--head);letter-spacing:.08em;padding:4px 10px;border-radius:8px;margin-bottom:6px}
+  .hero h2{margin:0;font:700 26px/1.1 var(--head);text-shadow:0 2px 8px #0008}
+  h2{font-family:var(--head);text-wrap:balance}
+  h3{margin:14px 0 6px;font:700 12px var(--head);letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+  .phase{display:inline-flex;align-items:center;gap:6px;font:700 12px var(--head);letter-spacing:.06em;text-transform:uppercase;color:var(--navy2);background:#1fa5c822;padding:4px 10px;border-radius:8px}
+  .muted{color:var(--muted);font-size:14px}
+  ul.guion{margin:0;padding-left:0;list-style:none}ul.guion li{padding:7px 10px;border-left:3px solid var(--teal);background:var(--bg);border-radius:0 10px 10px 0;margin:5px 0;font-size:15px}
+  button.btn{display:block;width:100%;padding:14px;border:0;border-radius:14px;font:800 16px var(--body);cursor:pointer;margin-top:10px;color:#fff;background:var(--teal);box-shadow:0 4px 0 #1685a3}
+  .btn.green{background:var(--green);box-shadow:0 4px 0 #0f7a42}.btn.navy{background:var(--navy2);box-shadow:0 4px 0 #0b1a33}.btn.amber{background:var(--amber);color:#2b2000;box-shadow:0 4px 0 #c08d10}.btn.ghost{background:var(--line);color:var(--ink);box-shadow:none}.btn.red{background:var(--red);box-shadow:0 4px 0 #a52f3f}
+  .btn:disabled{opacity:.45;cursor:default}
+  .row{display:flex;gap:8px}.row .btn{flex:1}
+  .tw{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;border-radius:16px;padding:16px;min-height:96px;font-size:17px;line-height:1.55;white-space:pre-wrap}
+  .tw .cur{display:inline-block;width:2px;height:1em;background:#fff;vertical-align:-2px;animation:bl .8s infinite}
+  @keyframes bl{50%{opacity:0}}
+  .q{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;border-radius:16px;padding:16px;font:700 19px/1.3 var(--head)}
+  .opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin-top:8px;color:#fff;font-weight:700;position:relative;overflow:hidden}
+  .opt .sh{width:26px;height:26px;flex:none;display:grid;place-items:center;background:#ffffff33;border-radius:8px}
+  .opt .cnt{margin-left:auto;font:800 18px var(--head);background:#ffffff33;padding:2px 10px;border-radius:8px;font-variant-numeric:tabular-nums}
+  .opt.ok::after{content:"✓ correcta";position:absolute;right:52px;top:50%;transform:translateY(-50%);font:700 11px var(--head);letter-spacing:.08em;background:#fff;color:var(--green);padding:2px 8px;border-radius:6px}
+  .opt .fill{position:absolute;left:0;top:0;bottom:0;background:#ffffff22;transition:width .4s}
+  .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--teal);transition:width .4s}
+  .mapwrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .mapwrap img{width:100%;display:block}
+  .mk{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:var(--card);border:3px solid var(--navy2);color:var(--ink);font:800 11px var(--head);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px #0004}
+  .mk.done{background:var(--green);border-color:var(--green);color:#fff}
+  .mk.now{background:var(--red);border-color:#fff;color:#fff;width:38px;height:38px;font-size:13px;z-index:2;animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 12px #e14b5e44}}
+  @media (prefers-reduced-motion:reduce){.mk.now{animation:none}}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+  .tile{border:3px solid transparent;border-radius:14px;overflow:hidden;background:var(--bg);cursor:pointer;text-align:left;padding:0;color:var(--ink);position:relative}
+  .tile img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#0002}
+  .tile div{padding:7px 9px;font:700 13px/1.2 var(--body)}
+  .tile small{display:block;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+  .tile .num{position:absolute;top:6px;left:6px;background:var(--navy);color:#fff;font:800 12px var(--head);width:24px;height:24px;border-radius:50%;display:grid;place-items:center}
+  .tile.now{border-color:var(--red)}.tile.done{border-color:var(--green)}.tile.done .num{background:var(--green)}.tile.now .num{background:var(--red)}
+  .rk{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px}
+  .rk:nth-child(odd){background:var(--bg)}
+  .rk .pos{font:800 18px var(--head);width:26px;color:var(--muted)}
+  .rk .pos.g{color:#d4a017}.rk .pos.s{color:#8e9aa8}.rk .pos.b{color:#b87333}
+  .rk .nm{flex:1;min-width:0}.rk .nm small{display:block;color:var(--muted);font-weight:600}
+  .rk .sc{font-weight:800;font-variant-numeric:tabular-nums}
+  .podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;margin:10px 0}
+  .pod{text-align:center;background:var(--bg);border-radius:14px 14px 6px 6px;padding:10px 6px 8px}
+  .pod .avw{display:flex;justify-content:center}.pod b{display:block;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pod small{color:var(--muted)}
+  .pod.p1{background:linear-gradient(180deg,#f5b82e55,var(--bg));padding-top:16px}.pod.p2{background:linear-gradient(180deg,#9fb1d055,var(--bg))}.pod.p3{background:linear-gradient(180deg,#c9843a55,var(--bg))}
+  .roster{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .gate{max-width:380px;margin:50px auto;text-align:center}
+  input{width:100%;padding:14px;font:600 18px var(--body);border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);text-align:center}
+  .steps{display:flex;gap:6px;margin:10px 0 4px}.steps span{flex:1;height:6px;border-radius:3px;background:var(--line)}.steps span.on{background:var(--teal)}.steps span.done{background:var(--green)}
+  .small{font-size:13px}
+  .kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
+  .kpi div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}.kpi b{display:block;font:800 24px var(--head);color:var(--navy2)}.kpi small{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  .xbtn{width:auto;margin:0;padding:6px 10px;font-size:13px;box-shadow:none}
+</style>
+</head>
+<body>
+<div id="gate" class="gate card" hidden>
+  <h2>Panel del profesor</h2>
+  <p class="muted">Introduce el PIN de config.js</p>
+  <input id="pin" type="password" inputmode="numeric" placeholder="PIN">
+  <button class="btn" id="pinBtn">Entrar</button>
+</div>
+
+<div id="app" hidden>
+<header>
+  <h1><b>CAAC</b> · Visita al monasterio</h1>
+  <span class="pill" id="pMode"></span>
+  <span class="pill on" id="pPlayers">0 👥</span>
+</header>
+<div class="step"></div>
+<nav class="tabs">
+  <button data-v="parada" class="act">📍 Parada</button>
+  <button data-v="plano">🗺️ Plano</button>
+  <button data-v="ranking">🏆 Ranking</button>
+  <button data-v="alumnos">👥 Alumnos</button>
+</nav>
+<main>
+  <section id="v-parada" class="view act"></section>
+  <section id="v-plano" class="view">
+    <div class="card">
+      <h3>¿Dónde estamos? Toca un punto o una foto para situarte</h3>
+      <div class="mapwrap"><img src="img/plano.jpg" alt="Plano del CAAC" id="mapimg"><div id="marks"></div></div>
+      <p class="muted small" style="margin:8px 0 0">Rojo: parada actual · verde: visitadas · números según el orden de la ruta.</p>
+    </div>
+    <div class="card"><h3>Recorrido en orden</h3><div class="grid" id="tiles"></div></div>
+  </section>
+  <section id="v-ranking" class="view"><div class="card"><h3>Ranking general</h3><div id="rank"></div></div></section>
+  <section id="v-alumnos" class="view">
+    <div class="card"><h3>Alumnado conectado</h3><div id="alumnos"></div>
+      <button class="btn red" id="resetBtn" style="margin-top:16px">⚠️ Reiniciar visita (borra jugadores y puntos)</button>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
+const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
+let state={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}};
+let players={}, answers={}, hearHere=false, twTimer=null, twDone=false;
+
+(function gate(){
+  if(localStorage.getItem("caac_pin")===String(CONFIG.pin)) return start();
+  $("gate").hidden=false;
+  $("pinBtn").onclick=()=>{ if($("pin").value===String(CONFIG.pin)){localStorage.setItem("caac_pin",$("pin").value);$("gate").hidden=true;start();} else U.alert("PIN incorrecto"); };
+})();
+
+function start(){
+  $("app").hidden=false;
+  $("pMode").textContent = Store.mode==="firebase" ? "en línea" : "modo local";
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.v));
+  Store.on("state",s=>{ if(s){ state=Object.assign(state,s); } else { Store.set("state",state); } renderAll(); });
+  Store.on("players",p=>{ players=p||{}; $("pPlayers").textContent=Object.values(players).filter(x=>x.av).length+" 👥"; renderRank(); renderAlumnos(); renderParada(); });
+  Store.on("answers",a=>{ answers=a||{}; renderParada(); });
+  $("resetBtn").onclick=async()=>{ if(await U.ask("¿Borrar jugadores, respuestas y puntos y volver al inicio?","Sí, reiniciar")){ await Store.set("players",null); await Store.set("answers",null); await Store.set("claims",null); await Store.set("duels",null); await Store.set("state",{stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}}); } };
+}
+function showTab(v){ document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("act",x.dataset.v===v)); document.querySelectorAll(".view").forEach(x=>x.classList.toggle("act",x.id==="v-"+v)); window.scrollTo(0,0); }
+const setState=o=>Store.update("state",o);
+const online=()=>Object.values(players).filter(p=>p.av).length;
+
+function renderAll(){ renderParada(); renderMap(); renderTiles(); renderRank(); }
+function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
+
+function renderParada(){
+  const s=P[state.stop]; if(!s) return;
+  const ph=state.phase, nQ=s.preguntas.length;
+  const phases={lobby:"Sala de espera",stop:"En la parada",audio:"Reproduciendo audio",question:"Pregunta "+(state.q+1)+" de "+nQ,ranking:"Mostrando ranking",end:"Visita terminada"};
+  let html=`<div class="card">${hero(s)}
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="phase">${phases[ph]||ph}</span><span class="muted small">${online()} conectados</span></div>
+    <div class="steps">${s.preguntas.map((_,k)=>`<span class="${ph==="ranking"||k<state.q?"done":(ph==="question"&&k===state.q?"on":"")}"></span>`).join("")}</div>`;
+
+  if(ph==="lobby"){
+    const ps=Object.values(players).filter(p=>p.av);
+    html+=`<p class="muted">El alumnado escanea el QR, elige compositor/a y entra.</p>
+      <div class="roster">${ps.map(p=>`<span title="${esc(p.name)}">${avSVG(p.av,38)}</span>`).join("")||'<span class="muted small">Todavía nadie.</span>'}</div>
+      <button class="btn green" id="bStart">▶ Empezar la visita en ${esc(s.nombre)}</button></div>`;
+  } else if(ph==="stop"||ph==="audio"){
+    html+=`<h3>Guion para ti</h3><ul class="guion">${s.profesor.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+      <h3>Audio para el alumnado</h3>
+      <div class="tw" id="tw">${ph==="audio"?"":"<span style='opacity:.75'>Pulsa «Reproducir» y aquí verás el texto escribiéndose mientras suena en sus móviles.</span>"}</div>
+      <label class="small muted" style="display:block;margin:8px 0"><input type="checkbox" id="hear" style="width:auto" ${hearHere?"checked":""}> Escucharlo también en este dispositivo</label>
+      <div class="row">
+        <button class="btn navy" id="bAudio">${ph==="audio"?"🔁 Repetir audio":"▶ Reproducir audio en los móviles"}</button>
+        ${ph==="audio"?`<button class="btn green" id="bQ0" ${twDone?"":"disabled"}>${twDone?"❓ Lanzar pregunta 1":"⏳ Sonando…"}</button>`:""}
+      </div>
+      ${ph==="stop"?`<button class="btn ghost" id="bSkipAudio">Saltar audio → preguntas</button>`:""}
+      </div>`;
+  } else if(ph==="question"){
+    const q=s.preguntas[state.q], key=state.stop+"_"+state.q, ans=answers[key]||{};
+    const counts=q.opciones.map((_,k)=>Object.values(ans).filter(a=>a.choice===k).length);
+    const total=Object.keys(ans).length, n=online();
+    html+=`<div class="q">${esc(q.q)}</div>
+      ${q.opciones.map((o,k)=>`<div class="opt ${k===q.correcta?"ok":""}" style="background:${OCOL[k]}"><i class="fill" style="width:${total?counts[k]/total*100:0}%"></i><span class="sh">${SHAPES[k]}</span><span style="position:relative">${esc(o)}</span><span class="cnt">${counts[k]}</span></div>`).join("")}
+      <p class="muted" style="margin:12px 0 0">Han respondido <b>${total}</b> de ${n}</p>
+      <div class="bar"><i style="width:${n?Math.min(100,total/n*100):0}%"></i></div>
+      ${state.q+1<nQ?`<button class="btn green" id="bNextQ">Siguiente pregunta (${state.q+2}/${nQ}) →</button>`:`<button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`}
+      <button class="btn ghost" id="bRepeat">🔁 Repetir el audio</button></div>`;
+  } else if(ph==="ranking"){
+    html+=`<p class="muted">El alumnado está viendo el ranking. Cuando lleguéis a la siguiente parada, pulsa:</p>
+      ${state.stop+1<P.length?`<button class="btn green" id="bNextStop">→ Siguiente: ${esc(P[state.stop+1].nombre)}</button>`:`<button class="btn amber" id="bEnd">🏁 Terminar la visita (ranking final)</button>`}
+      <button class="btn ghost" id="bPick">Elegir otra parada en el plano</button></div>`;
+  } else if(ph==="end"){
+    html+=`<p>Visita terminada. El alumnado ve el ranking final.</p><button class="btn ghost" id="bPick">Volver a una parada</button></div>`;
+  }
+  $("v-parada").innerHTML=html;
+  const on=(id,fn)=>{const e=$(id); if(e) e.onclick=fn;};
+  on("bStart",()=>setState({phase:"stop",q:-1}));
+  on("bAudio",playAudio); on("bRepeat",playAudio);
+  on("bSkipAudio",()=>launchQ(0)); on("bQ0",()=>launchQ(0)); on("bNextQ",()=>launchQ(state.q+1));
+  on("bRank",()=>setState({phase:"ranking"}));
+  on("bNextStop",()=>goStop(state.stop+1)); on("bEnd",()=>setState({phase:"end"}));
+  on("bPick",()=>showTab("plano"));
+  const h=$("hear"); if(h) h.onchange=()=>hearHere=h.checked;
+  if(ph==="audio" && twTimer===null && !twDone) typewriter(s.audio);
+}
+
+function launchQ(k){ stopTw(); setState({phase:"question",q:k,qStart:Store.now()}); }
+function goStop(k){
+  stopTw(); twDone=false;
+  const visited=Object.assign({},state.visited||{}); visited[state.stop]=true;
+  setState({stop:k,phase:"stop",q:-1,visited}); showTab("parada");
+}
+function playAudio(){
+  stopTw(); twDone=false;
+  setState({phase:"audio",audioSeq:(state.audioSeq||0)+1,q:-1});
+  if(hearHere && "speechSynthesis" in window){ speechSynthesis.cancel(); const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang)); const v=vs.find(x=>/natural|neural|premium|enhanced|google/i.test(x.name))||vs.find(x=>/es[-_]ES/i.test(x.lang))||vs[0];
+    (P[state.stop].audio.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g)||[P[state.stop].audio]).forEach(t=>{ const u=new SpeechSynthesisUtterance(t.trim()); u.lang="es-ES"; if(v) u.voice=v; u.rate=0.92; speechSynthesis.speak(u); }); }
+}
+function typewriter(text){
+  const el=$("tw"); if(!el) return; let i=0; el.innerHTML="<span class='cur'></span>";
+  const cps=15;
+  twTimer=setInterval(()=>{ i+=1; if(!$("tw")){stopTw();return;}
+    $("tw").innerHTML=esc(text.slice(0,i))+"<span class='cur'></span>";
+    if(i>=text.length){ stopTw(); twDone=true; $("tw").innerHTML=esc(text); const b=$("bQ0"); if(b){b.disabled=false;b.textContent="❓ Lanzar pregunta 1";} }
+  },1000/cps);
+}
+function stopTw(){ if(twTimer) clearInterval(twTimer); twTimer=null; }
+
+function renderMap(){
+  $("marks").innerHTML=P.map((s,k)=>`<button class="mk ${k===state.stop?"now":(state.visited&&state.visited[k]?"done":"")}" style="left:${s.x}%;top:${s.y}%" data-k="${k}" title="${esc(s.nombre)}">${k+1}</button>`).join("");
+  document.querySelectorAll(".mk").forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function renderTiles(){
+  $("tiles").innerHTML=P.map((s,k)=>`<button class="tile ${k===state.stop?"now":(state.visited&&state.visited[k]?"done":"")}" data-k="${k}"><span class="num">${k+1}</span>${U.imgTag(s)}<div>${esc(s.nombre)}<small>Plano ${esc(s.plano)}</small></div></button>`).join("");
+  document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+async function pick(k){ if(k===state.stop) return showTab("parada"); if(await U.ask("Ir a «"+P[k].nombre+"»?\nEl alumnado saldrá del ranking y verá esta parada.","Ir ahí")) goStop(k); }
+
+function sorted(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av).sort((a,b)=>(b.score||0)-(a.score||0)); }
+function renderRank(){
+  const list=sorted(); if(!list.length){ $("rank").innerHTML="<p class='muted'>Todavía no hay alumnado.</p>"; return; }
+  const pod=i=>list[i]?`<div class="pod p${i+1}"><div class="avw">${avSVG(list[i].av,i===0?64:50)}</div><b>${esc(list[i].name)}</b><small>${list[i].score||0}</small></div>`:`<div></div>`;
+  $("rank").innerHTML=`<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>`+list.slice(3).map((p,i)=>`<div class="rk"><span class="pos">${i+4}</span>${avSVG(p.av,32)}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"")}</small></span><span class="sc">${p.score||0}</span></div>`).join("");
+}
+function renderAlumnos(){
+  const now=Store.now(), list=Object.entries(players).map(([id,p])=>Object.assign({id},p));
+  $("alumnos").innerHTML=list.map(p=>`<div class="rk"><span>${(now-(p.last||0))<90000?"🟢":"⚪"}</span>${p.av?avSVG(p.av,32):"❔"}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"sin compositor")}</small></span><span class="sc">${p.score||0}</span><button class="btn red xbtn" data-id="${p.id}">✕</button></div>`).join("")||"<p class='muted'>Nadie conectado.</p>";
+  document.querySelectorAll("#alumnos .xbtn").forEach(b=>b.onclick=async()=>{ const p=players[b.dataset.id]; if(await U.ask("¿Expulsar a "+p.name+"?","Expulsar")){ if(p.av) await Store.set("claims/"+p.av,null); await Store.set("players/"+b.dataset.id,null);} });
+}
+</script>
+</body>
+</html>
