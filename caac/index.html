@@ -147,8 +147,9 @@ function speakTTS(text,onDone){
   next();
 }
 function unlockAudio(){
-  if(unlocked) return;
-  try{ AUD.src=SILENT; const pr=AUD.play(); if(pr&&pr.then) pr.then(()=>{ unlocked=true; AUD.pause(); hideBlocked(); if(pending){ const q=pending; pending=null; speak(q[0],q[1]); } }).catch(()=>{}); }catch(e){}
+  // Nunca tocar el <audio> si ya está sonando: cambiarle el src (aunque sea el silencio) lo cortaría.
+  if(unlocked || curAudio===AUD || !AUD.paused) return;
+  try{ AUD.src=SILENT; const pr=AUD.play(); if(pr&&pr.then) pr.then(()=>{ unlocked=true; if(curAudio!==AUD) AUD.pause(); hideBlocked(); if(pending){ const q=pending; pending=null; speak(q[0],q[1]); } }).catch(()=>{}); }catch(e){}
   if(canSpeak){ try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u);}catch(e){} }
   try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").catch(()=>{}); }catch(e){}
 }
@@ -170,6 +171,7 @@ function speak(text,id){
     AUD.onerror=()=>{ if(curAudio===AUD){ curAudio=null; speakTTS(text,markDone); } };
     AUD.src="audio/"+id+".mp3"; AUD.currentTime=0;
     const pr=AUD.play();
+    if(pr&&pr.then) pr.then(()=>{ unlocked=true; });
     if(pr&&pr.catch) pr.catch(err=>{ if(curAudio!==AUD) return;
       if(err&&err.name==="NotAllowedError"){ pending=[text,id]; showBlocked(); } else { curAudio=null; speakTTS(text,markDone); } });
     return; }
