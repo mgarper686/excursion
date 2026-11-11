@@ -13,6 +13,7 @@
 <script src="avatars.js"></script>
 <script src="compositores.js"></script>
 <script src="store.js"></script>
+<script src="ranking.js"></script>
 <style>
   :root{--navy:#12233f;--navy2:#1b3358;--royal:#2b4fb8;--teal:#1fa5c8;--green:#16a35a;--amber:#f5b82e;--red:#e14b5e;
     --bg:#eef2f8;--card:#fff;--ink:#15213a;--muted:#5b6b86;--line:#dbe2ee;
@@ -92,6 +93,10 @@
   .kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
   .kpi div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}.kpi b{display:block;font:800 24px var(--head);color:var(--navy2)}.kpi small{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
   .xbtn{width:auto;margin:0;padding:6px 10px;font-size:13px;box-shadow:none}
+  .ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.ctl .btn{margin:0;padding:12px 6px;font-size:15px}
+  .endbar{margin-top:18px;border-top:1px dashed var(--line);padding-top:6px}
+  .undo{background:#f5b82e33;border:1px solid #f5b82e88;border-radius:12px;padding:8px 10px;margin:10px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}.undo .btn{width:auto;margin:0;padding:7px 12px;font-size:14px;box-shadow:none}
+  .musicrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0 0;font-size:14px}.musicrow label{display:flex;gap:6px;align-items:center}.musicrow input{width:auto}
 </style>
 </head>
 <body>
@@ -106,28 +111,30 @@
 <header>
   <h1><b>CAAC</b> · Visita al monasterio</h1>
   <span class="pill" id="pMode"></span>
-  <span class="pill on" id="pPlayers">0 👥</span>
+  <button class="pill on" id="pPlayers" type="button" style="border:0;color:#fff;cursor:pointer" title="Ver la sala">0 👥</button>
 </header>
 <div class="step"></div>
 <nav class="tabs">
   <button data-v="parada" class="act">📍 Parada</button>
   <button data-v="plano">🗺️ Plano</button>
   <button data-v="ranking">🏆 Ranking</button>
-  <button data-v="alumnos">👥 Alumnos</button>
+  <button data-v="alumnos" id="tabSala">👥 Sala</button>
 </nav>
 <main>
   <section id="v-parada" class="view act"></section>
   <section id="v-plano" class="view">
     <div class="card">
+      <div id="planBack"></div>
       <h3>¿Dónde estamos? Toca un punto o una foto para situarte</h3>
       <div class="mapwrap"><img src="img/plano.jpg" alt="Plano del CAAC" id="mapimg"><div id="marks"></div></div>
       <p class="muted small" style="margin:8px 0 0">Rojo: parada actual · verde: visitadas · números según el orden de la ruta.</p>
     </div>
     <div class="card"><h3>Recorrido en orden</h3><div class="grid" id="tiles"></div></div>
   </section>
-  <section id="v-ranking" class="view"><div class="card"><h3>Ranking general</h3><div id="rank"></div></div></section>
+  <section id="v-ranking" class="view"><div id="rank"></div></section>
   <section id="v-alumnos" class="view">
-    <div class="card"><h3>Alumnado conectado</h3><div id="alumnos"></div>
+    <div class="card"><h3>Sala · alumnado conectado</h3><div id="alumnos"></div>
+      <button class="btn ghost" id="toLobby" style="margin-top:12px">↩ Volver a la sala de espera (música y pantalla de espera)</button>
       <button class="btn red" id="resetBtn" style="margin-top:16px">⚠️ Reiniciar visita (borra jugadores y puntos)</button>
     </div>
   </section>
@@ -138,7 +145,9 @@
 const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
 const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
 let state={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}};
-let players={}, answers={}, hearHere=false, twTimer=null, twDone=false;
+const DEF={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{},prev:null,ctl:null,musica:true};
+let players={}, answers={}, hearHere=false, hearMusic=false, twTimer=null, twDone=false, twText="", twI=0, twCps=15, twPaused=false, DUR={};
+const TAUD=new Audio(); TAUD.setAttribute("playsinline","");
 
 (function gate(){
   if(localStorage.getItem("caac_pin")===String(CONFIG.pin)) return start();
@@ -150,42 +159,68 @@ function start(){
   $("app").hidden=false;
   $("pMode").textContent = Store.mode==="firebase" ? "en línea" : "modo local";
   document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.v));
-  Store.on("state",s=>{ if(s){ state=Object.assign(state,s); } else { Store.set("state",state); } renderAll(); });
-  Store.on("players",p=>{ players=p||{}; $("pPlayers").textContent=Object.values(players).filter(x=>x.av).length+" 👥"; renderRank(); renderAlumnos(); renderParada(); });
+  $("pPlayers").onclick=()=>showTab("alumnos");
+  $("toLobby").onclick=async()=>{ if(await U.ask("¿Volver a la pantalla de sala de espera? El alumnado verá la sala y sonará la música de espera.","Sí, volver")) { stopTw(); stopTeacherAudio(); setState({phase:"lobby",q:-1,ctl:null}); showTab("parada"); } };
+  Store.on("state",s=>{ if(s){ state=Object.assign({},DEF,s); } else { state=Object.assign({},DEF); Store.set("state",state); } renderAll(); });
+  let lastPSig="";
+  Store.on("players",p=>{ players=p||{};
+    const ps=Object.entries(players).map(([id,x])=>id+"|"+x.name+"|"+x.av+"|"+(x.score||0)+"|"+JSON.stringify(x.by||0)).sort().join(";");
+    if(ps===lastPSig) return; lastPSig=ps; $("pPlayers").textContent=Object.values(players).filter(x=>x.av).length+" 👥"; $("tabSala").textContent="👥 Sala ("+online()+")"; renderRank(); renderAlumnos(); if(state.phase==="lobby"||state.phase==="ranking"||state.phase==="end") renderParada(); });
   Store.on("answers",a=>{ answers=a||{}; renderParada(); });
-  $("resetBtn").onclick=async()=>{ if(await U.ask("¿Borrar jugadores, respuestas y puntos y volver al inicio?","Sí, reiniciar")){ await Store.set("players",null); await Store.set("answers",null); await Store.set("claims",null); await Store.set("duels",null); await Store.set("state",{stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}}); } };
+  $("resetBtn").onclick=async()=>{ if(await U.ask("¿Borrar jugadores, respuestas y puntos y volver al inicio?","Sí, reiniciar")){ await Store.set("players",null); await Store.set("answers",null); await Store.set("claims",null); await Store.set("duels",null); await Store.set("state",Object.assign({},DEF)); } };
 }
 function showTab(v){ document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("act",x.dataset.v===v)); document.querySelectorAll(".view").forEach(x=>x.classList.toggle("act",x.id==="v-"+v)); window.scrollTo(0,0); }
 const setState=o=>Store.update("state",o);
 const online=()=>Object.values(players).filter(p=>p.av).length;
+const TRACK={lobby:"espera",ranking:"ranking",end:"podium"};
 
-function renderAll(){ renderParada(); renderMap(); renderTiles(); renderRank(); }
+function renderAll(){ renderParada(); renderMap(); renderTiles(); renderRank(); renderBack(); }
 function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
 
+function ensureDur(id){ if(DUR[id]!==undefined) return; DUR[id]=0; try{ const a=new Audio(); a.preload="metadata"; a.src="audio/"+id+".mp3"; a.onloadedmetadata=()=>{ DUR[id]=a.duration||0; }; }catch(e){} }
+function rowsSala(){
+  const now=Store.now(), list=Object.entries(players).map(([id,p])=>Object.assign({id},p));
+  return list.map(p=>`<div class="rk"><span>${(now-(p.last||0))<90000?"🟢":"⚪"}</span>${p.av?avSVG(p.av,32):"❔"}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"sin compositor")}</small></span><span class="sc">${p.score||0}</span><button class="btn red xbtn" data-id="${p.id}" title="Expulsar">✕</button></div>`).join("")||"<p class='muted'>Nadie conectado todavía.</p>";
+}
+function bindExpel(root){
+  root.querySelectorAll(".xbtn").forEach(b=>b.onclick=async()=>{ const p=players[b.dataset.id]; if(!p) return; if(await U.ask("¿Expulsar a "+p.name+"?","Expulsar")){ if(p.av) await Store.set("claims/"+p.av,null); await Store.set("players/"+b.dataset.id,null);} });
+}
+function musicBlock(){
+  return `<div class="musicrow"><label><input type="checkbox" id="mStud" ${state.musica!==false?"checked":""}> 🎵 Música en los móviles</label>
+    <label><input type="checkbox" id="mHere" ${hearMusic?"checked":""}> y también en este dispositivo</label></div>`;
+}
+function undoBlock(){
+  return state.prev?`<div class="undo"><span>¿Te equivocaste de parada?</span><button class="btn ghost" id="bUndo">↩ Volver a «${esc((P[state.prev.stop]||{}).nombre||"anterior")}»</button></div>`:"";
+}
 function renderParada(){
   const s=P[state.stop]; if(!s) return;
   const ph=state.phase, nQ=s.preguntas.length;
-  const phases={lobby:"Sala de espera",stop:"En la parada",audio:"Reproduciendo audio",question:"Pregunta "+(state.q+1)+" de "+nQ,ranking:"Mostrando ranking",end:"Visita terminada"};
+  ensureDur(s.id);
+  const paused=!!(state.ctl&&state.ctl.cmd==="pause");
+  const phases={lobby:"Sala de espera",stop:"En la parada",audio:paused?"Audio en pausa":"Reproduciendo audio",question:"Pregunta "+(state.q+1)+" de "+nQ,ranking:"Mostrando ranking",end:"Visita terminada"};
+  // la música del dispositivo del profesor (opcional)
+  Music.enabled(true); Music.set(hearMusic&&TRACK[ph]?TRACK[ph]:null);
   let html=`<div class="card">${hero(s)}
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="phase">${phases[ph]||ph}</span><span class="muted small">${online()} conectados</span></div>
-    <div class="steps">${s.preguntas.map((_,k)=>`<span class="${ph==="ranking"||k<state.q?"done":(ph==="question"&&k===state.q?"on":"")}"></span>`).join("")}</div>`;
+    <div class="steps">${s.preguntas.map((_,k)=>`<span class="${ph==="ranking"||k<state.q?"done":(ph==="question"&&k===state.q?"on":"")}"></span>`).join("")}</div>${undoBlock()}`;
 
   if(ph==="lobby"){
-    const ps=Object.values(players).filter(p=>p.av);
-    html+=`<p class="muted">El alumnado escanea el QR, elige compositor/a y entra.</p>
-      <div class="roster">${ps.map(p=>`<span title="${esc(p.name)}">${avSVG(p.av,38)}</span>`).join("")||'<span class="muted small">Todavía nadie.</span>'}</div>
+    html+=`<p class="muted" style="margin:10px 0 0">El alumnado escanea el QR, elige compositor/a y entra. Aquí ves quién está dentro; con ✕ expulsas a quien quieras.</p>
+      <h3>Sala (${online()})</h3><div id="lobbyRows">${rowsSala()}</div>
+      ${musicBlock()}
       <button class="btn green" id="bStart">▶ Empezar la visita en ${esc(s.nombre)}</button></div>`;
   } else if(ph==="stop"||ph==="audio"){
     html+=`<h3>Guion para ti</h3><ul class="guion">${s.profesor.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
       <h3>Audio para el alumnado</h3>
-      <div class="tw" id="tw">${ph==="audio"?"":"<span style='opacity:.75'>Pulsa «Reproducir» y aquí verás el texto escribiéndose mientras suena en sus móviles.</span>"}</div>
+      <div class="tw" id="tw">${ph==="audio"?esc(twDone?twText:twText.slice(0,Math.floor(twI))):"<span style='opacity:.75'>Pulsa «Reproducir» y aquí verás el texto escribiéndose mientras suena en sus móviles.</span>"}</div>
       <label class="small muted" style="display:block;margin:8px 0"><input type="checkbox" id="hear" style="width:auto" ${hearHere?"checked":""}> Escucharlo también en este dispositivo</label>
-      <div class="row">
-        <button class="btn navy" id="bAudio">${ph==="audio"?"🔁 Repetir audio":"▶ Reproducir audio en los móviles"}</button>
-        ${ph==="audio"?`<button class="btn green" id="bQ0" ${twDone?"":"disabled"}>${twDone?"❓ Lanzar pregunta 1":"⏳ Sonando…"}</button>`:""}
-      </div>
-      ${ph==="stop"?`<button class="btn ghost" id="bSkipAudio">Saltar audio → preguntas</button>`:""}
-      </div>`;
+      ${ph==="stop"?`<button class="btn navy" id="bAudio">▶ Reproducir audio en los móviles</button><button class="btn ghost" id="bSkipAudio">Saltar audio → preguntas</button>`
+        :`<div class="ctl">
+            <button class="btn ${paused?"green":"amber"}" id="bPause">${paused?"▶ Reanudar":"⏸ Pausar"}</button>
+            <button class="btn red" id="bStopAudio">⏹ Parar</button>
+            <button class="btn navy" id="bAudio">🔁 Desde el principio</button></div>
+          <button class="btn green" id="bQ0" ${twDone?"":"disabled"}>${twDone?"❓ Lanzar pregunta 1":"⏳ Sonando… (o pulsa Parar)"}</button>`}
+      <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>`;
   } else if(ph==="question"){
     const q=s.preguntas[state.q], key=state.stop+"_"+state.q, ans=answers[key]||{};
     const counts=q.opciones.map((_,k)=>Object.values(ans).filter(a=>a.choice===k).length);
@@ -195,45 +230,84 @@ function renderParada(){
       <p class="muted" style="margin:12px 0 0">Han respondido <b>${total}</b> de ${n}</p>
       <div class="bar"><i style="width:${n?Math.min(100,total/n*100):0}%"></i></div>
       ${state.q+1<nQ?`<button class="btn green" id="bNextQ">Siguiente pregunta (${state.q+2}/${nQ}) →</button>`:`<button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`}
-      <button class="btn ghost" id="bRepeat">🔁 Repetir el audio</button></div>`;
+      <button class="btn ghost" id="bRepeat">🔁 Repetir el audio</button>
+      <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>`;
   } else if(ph==="ranking"){
-    html+=`<p class="muted">El alumnado está viendo el ranking. Cuando lleguéis a la siguiente parada, pulsa:</p>
-      ${state.stop+1<P.length?`<button class="btn green" id="bNextStop">→ Siguiente: ${esc(P[state.stop+1].nombre)}</button>`:`<button class="btn amber" id="bEnd">🏁 Terminar la visita (ranking final)</button>`}
-      <button class="btn ghost" id="bPick">Elegir otra parada en el plano</button></div>`;
+    html+=`<p class="muted" style="margin:10px 0 0">El alumnado está viendo el marcador (con música). Cuando lleguéis a la siguiente parada, pulsa:</p>
+      ${state.stop+1<P.length?`<button class="btn green" id="bNextStop">→ Siguiente: ${esc(P[state.stop+1].nombre)}</button>`:`<button class="btn amber" id="bEnd">🏁 Terminar la visita (podio final)</button>`}
+      <button class="btn ghost" id="bPick">Elegir otra parada en el plano</button>
+      ${musicBlock()}
+      <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>
+      <div id="tRank"></div>`;
   } else if(ph==="end"){
-    html+=`<p>Visita terminada. El alumnado ve el ranking final.</p><button class="btn ghost" id="bPick">Volver a una parada</button></div>`;
+    html+=`<p class="muted" style="margin:10px 0 0">Los móviles muestran el podio con música. Puedes proyectar este también.</p>
+      <button class="btn ghost" id="bResume">↩ Seguir la visita (volver a «${esc(s.nombre)}»)</button>
+      <button class="btn ghost" id="bReplay">🔁 Repetir la revelación del podio</button>
+      ${musicBlock()}</div>
+      <div id="tPodium"></div>`;
   }
   $("v-parada").innerHTML=html;
   const on=(id,fn)=>{const e=$(id); if(e) e.onclick=fn;};
   on("bStart",()=>setState({phase:"stop",q:-1}));
   on("bAudio",playAudio); on("bRepeat",playAudio);
+  on("bPause",()=>audioCtl(paused?"resume":"pause")); on("bStopAudio",()=>audioCtl("stop"));
   on("bSkipAudio",()=>launchQ(0)); on("bQ0",()=>launchQ(0)); on("bNextQ",()=>launchQ(state.q+1));
-  on("bRank",()=>setState({phase:"ranking"}));
-  on("bNextStop",()=>goStop(state.stop+1)); on("bEnd",()=>setState({phase:"end"}));
+  on("bRank",()=>{ stopTeacherAudio(); setState({phase:"ranking"}); });
+  on("bNextStop",()=>goStop(state.stop+1));
+  on("bEnd",()=>finish());
+  on("bFinish",async()=>{ if(await U.ask("¿Terminar aquí y mostrar el podio con los tres primeros?","🏁 Terminar")) finish(); });
+  on("bResume",()=>setState({phase:"stop",q:-1}));
+  on("bReplay",()=>podiumReveal($("tPodium")));
   on("bPick",()=>showTab("plano"));
-  const h=$("hear"); if(h) h.onchange=()=>hearHere=h.checked;
+  on("bUndo",undoStop);
+  const h=$("hear"); if(h) h.onchange=()=>{ hearHere=h.checked; if(!hearHere) stopTeacherAudio(); };
+  const ms=$("mStud"); if(ms) ms.onchange=()=>setState({musica:ms.checked});
+  const mh=$("mHere"); if(mh) mh.onchange=()=>{ hearMusic=mh.checked; Music.set(hearMusic&&TRACK[ph]?TRACK[ph]:null); };
+  if(ph==="lobby") bindExpel($("lobbyRows"));
+  if(ph==="ranking"){ $("tRank").innerHTML=rankBoard(sortedPlayers(),{stop:state.stop,max:8,title:"🏆 Marcador",sub:esc(s.nombre)}); rankAnimate($("tRank")); }
+  if(ph==="end"){ $("tPodium").innerHTML=podiumView(sortedPlayers()); podiumReveal($("tPodium")); }
   if(ph==="audio" && twTimer===null && !twDone) typewriter(s.audio);
 }
+function sortedPlayers(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av); }
+function finish(){ stopTw(); stopTeacherAudio(); const visited=Object.assign({},state.visited||{}); visited[state.stop]=true; setState({phase:"end",visited,q:-1}); showTab("parada"); }
 
-function launchQ(k){ stopTw(); setState({phase:"question",q:k,qStart:Store.now()}); }
+function launchQ(k){ stopTw(); stopTeacherAudio(); setState({phase:"question",q:k,qStart:Store.now()}); }
 function goStop(k){
-  stopTw(); twDone=false;
-  const visited=Object.assign({},state.visited||{}); visited[state.stop]=true;
-  setState({stop:k,phase:"stop",q:-1,visited}); showTab("parada");
+  stopTw(); stopTeacherAudio(); twDone=false; twText=""; twI=0;
+  const old=state.visited||{}, visited=Object.assign({},old); visited[state.stop]=true;
+  setState({stop:k,phase:"stop",q:-1,visited,ctl:null,prev:{stop:state.stop,visited:Object.assign({},old)}}); showTab("parada");
 }
+function undoStop(){
+  if(!state.prev) return; stopTw(); stopTeacherAudio(); twDone=false;
+  setState({stop:state.prev.stop,phase:"stop",q:-1,visited:state.prev.visited||{},prev:null,ctl:null}); showTab("parada");
+}
+function stopTeacherAudio(){ try{ TAUD.pause(); }catch(e){} if("speechSynthesis" in window) speechSynthesis.cancel(); }
 function playAudio(){
-  stopTw(); twDone=false;
-  setState({phase:"audio",audioSeq:(state.audioSeq||0)+1,q:-1});
-  if(hearHere && "speechSynthesis" in window){ speechSynthesis.cancel(); const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang)); const v=vs.find(x=>/natural|neural|premium|enhanced|google/i.test(x.name))||vs.find(x=>/es[-_]ES/i.test(x.lang))||vs[0];
-    (P[state.stop].audio.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g)||[P[state.stop].audio]).forEach(t=>{ const u=new SpeechSynthesisUtterance(t.trim()); u.lang="es-ES"; if(v) u.voice=v; u.rate=0.92; speechSynthesis.speak(u); }); }
+  const s=P[state.stop];
+  stopTw(); twDone=false; twPaused=false; stopTeacherAudio(); twText=""; twI=0;
+  const d=DUR[s.id]; twCps = d>2 ? Math.min(40,Math.max(8,s.audio.length/(d+0.2))) : 15;
+  setState({phase:"audio",audioSeq:(state.audioSeq||0)+1,q:-1,ctl:{cmd:"play",seq:((state.ctl&&state.ctl.seq)||0)+1}});
+  if(hearHere){ TAUD.src="audio/"+s.id+".mp3"; TAUD.currentTime=0; const pr=TAUD.play(); if(pr&&pr.catch) pr.catch(()=>ttsHere(s.audio)); TAUD.onerror=()=>ttsHere(s.audio); }
+}
+function ttsHere(text){
+  if(!("speechSynthesis" in window)) return; speechSynthesis.cancel();
+  const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang)); const v=vs.find(x=>/natural|neural|premium|enhanced|google/i.test(x.name))||vs.find(x=>/es[-_]ES/i.test(x.lang))||vs[0];
+  (text.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g)||[text]).forEach(t=>{ const u=new SpeechSynthesisUtterance(t.trim()); u.lang="es-ES"; if(v) u.voice=v; u.rate=0.92; speechSynthesis.speak(u); });
+}
+// Pausar / reanudar / parar el audio en todos los móviles (y aquí)
+function audioCtl(cmd){
+  const seq=((state.ctl&&state.ctl.seq)||0)+1;
+  if(cmd==="pause"){ twPaused=true; if(hearHere){ TAUD.pause(); if("speechSynthesis" in window) speechSynthesis.pause(); } }
+  if(cmd==="resume"){ twPaused=false; if(hearHere){ if(TAUD.src&&!TAUD.ended&&TAUD.currentTime>0){ TAUD.play().catch(()=>{}); } if("speechSynthesis" in window) speechSynthesis.resume(); } }
+  if(cmd==="stop"){ twPaused=false; stopTw(); stopTeacherAudio(); twDone=true; twText=P[state.stop].audio; const el=$("tw"); if(el) el.textContent=twText; }
+  setState({ctl:{cmd,seq}});
 }
 function typewriter(text){
-  const el=$("tw"); if(!el) return; let i=0; el.innerHTML="<span class='cur'></span>";
-  const cps=15;
-  twTimer=setInterval(()=>{ i+=1; if(!$("tw")){stopTw();return;}
+  const el=$("tw"); if(!el) return; twText=text; twI=0; el.innerHTML="<span class='cur'></span>";
+  twTimer=setInterval(()=>{ if(twPaused) return; twI+=twCps/20; const i=Math.floor(twI); if(!$("tw")){stopTw();return;}
     $("tw").innerHTML=esc(text.slice(0,i))+"<span class='cur'></span>";
     if(i>=text.length){ stopTw(); twDone=true; $("tw").innerHTML=esc(text); const b=$("bQ0"); if(b){b.disabled=false;b.textContent="❓ Lanzar pregunta 1";} }
-  },1000/cps);
+  },50);
 }
 function stopTw(){ if(twTimer) clearInterval(twTimer); twTimer=null; }
 
@@ -245,19 +319,20 @@ function renderTiles(){
   $("tiles").innerHTML=P.map((s,k)=>`<button class="tile ${k===state.stop?"now":(state.visited&&state.visited[k]?"done":"")}" data-k="${k}"><span class="num">${k+1}</span>${U.imgTag(s)}<div>${esc(s.nombre)}<small>Plano ${esc(s.plano)}</small></div></button>`).join("");
   document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>pick(+b.dataset.k));
 }
-async function pick(k){ if(k===state.stop) return showTab("parada"); if(await U.ask("Ir a «"+P[k].nombre+"»?\nEl alumnado saldrá del ranking y verá esta parada.","Ir ahí")) goStop(k); }
+async function pick(k){ if(k===state.stop) return showTab("parada"); if(await U.ask("¿Ir a «"+P[k].nombre+"»?\nEl alumnado saldrá del ranking y verá esta parada. Podrás deshacerlo.","Ir ahí")) goStop(k); }
+function renderBack(){
+  const s=P[state.stop]; if(!s) return;
+  $("planBack").innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><button class="btn ghost" id="bBack" style="width:auto;margin:0;padding:10px 14px;box-shadow:none">← Volver a «${esc(s.nombre)}»</button>${state.prev?`<button class="btn ghost" id="bUndo2" style="width:auto;margin:0;padding:10px 14px;box-shadow:none">↩ Deshacer último cambio</button>`:""}</div>`;
+  $("bBack").onclick=()=>showTab("parada"); const u=$("bUndo2"); if(u) u.onclick=undoStop;
+}
 
-function sorted(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av).sort((a,b)=>(b.score||0)-(a.score||0)); }
+function sorted(){ return sortedPlayers().sort((a,b)=>(b.score||0)-(a.score||0)||String(a.name).localeCompare(String(b.name))); }
 function renderRank(){
-  const list=sorted(); if(!list.length){ $("rank").innerHTML="<p class='muted'>Todavía no hay alumnado.</p>"; return; }
-  const pod=i=>list[i]?`<div class="pod p${i+1}"><div class="avw">${avSVG(list[i].av,i===0?64:50)}</div><b>${esc(list[i].name)}</b><small>${list[i].score||0}</small></div>`:`<div></div>`;
-  $("rank").innerHTML=`<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>`+list.slice(3).map((p,i)=>`<div class="rk"><span class="pos">${i+4}</span>${avSVG(p.av,32)}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"")}</small></span><span class="sc">${p.score||0}</span></div>`).join("");
+  const list=sorted();
+  if(!list.length){ $("rank").innerHTML="<div class='card'><p class='muted'>Todavía no hay alumnado.</p></div>"; return; }
+  $("rank").innerHTML=rankBoard(list,{max:12,title:"🏆 Ranking general",sub:list.length+" participantes"}); rankAnimate($("rank"));
 }
-function renderAlumnos(){
-  const now=Store.now(), list=Object.entries(players).map(([id,p])=>Object.assign({id},p));
-  $("alumnos").innerHTML=list.map(p=>`<div class="rk"><span>${(now-(p.last||0))<90000?"🟢":"⚪"}</span>${p.av?avSVG(p.av,32):"❔"}<span class="nm">${esc(p.name)}<small>${esc(p.composer||"sin compositor")}</small></span><span class="sc">${p.score||0}</span><button class="btn red xbtn" data-id="${p.id}">✕</button></div>`).join("")||"<p class='muted'>Nadie conectado.</p>";
-  document.querySelectorAll("#alumnos .xbtn").forEach(b=>b.onclick=async()=>{ const p=players[b.dataset.id]; if(await U.ask("¿Expulsar a "+p.name+"?","Expulsar")){ if(p.av) await Store.set("claims/"+p.av,null); await Store.set("players/"+b.dataset.id,null);} });
-}
+function renderAlumnos(){ $("alumnos").innerHTML=rowsSala(); bindExpel($("alumnos")); }
 </script>
 </body>
 </html>

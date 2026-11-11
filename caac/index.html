@@ -13,6 +13,7 @@
 <script src="avatars.js"></script>
 <script src="compositores.js"></script>
 <script src="store.js"></script>
+<script src="ranking.js"></script>
 <style>
   /* Identidad: folleto del CAAC. Marino profundo, turquesa, verde Cartuja y el motivo escalonado del logo. */
   :root{--navy:#12233f;--navy2:#1b3358;--royal:#2b4fb8;--teal:#1fa5c8;--green:#16a35a;--lime:#39c27a;--amber:#f5b82e;--red:#e14b5e;
@@ -99,7 +100,7 @@
 </style>
 </head>
 <body>
-<header><span class="brand">CAAC</span><div class="who" id="who"><span>Visita al monasterio</span></div><span class="pts" id="hPts" hidden>0</span></header>
+<header><span class="brand">CAAC</span><div class="who" id="who"><span>Visita al monasterio</span></div><button id="mbtn" type="button" aria-label="Música" title="Música sí/no" style="border:0;background:#ffffff22;color:#fff;border-radius:12px;padding:4px 9px;font-size:16px;cursor:pointer">🎵</button><span class="pts" id="hPts" hidden>0</span></header>
 <div class="step"></div>
 <main id="main"></main>
 
@@ -112,7 +113,7 @@ const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)
 
 // ---------- audio ----------
 const canSpeak="speechSynthesis" in window;
-let VOICE=null, curAudio=null;
+let VOICE=null, curAudio=null, audioDone=false, audioPaused=false, lastCtlSeq=null, lastPhaseKey="", lastSig="";
 // Elige la voz española más natural que tenga el móvil (las "Natural", "Enhanced", "Premium" o de Google suenan mucho mejor).
 function pickVoice(){
   if(!canSpeak) return null;
@@ -129,28 +130,30 @@ function pickVoice(){
   return vs.map(v=>[score(v),v]).filter(x=>x[0]>=0).sort((a,b)=>b[0]-a[0]).map(x=>x[1])[0]||null;
 }
 if(canSpeak){ VOICE=pickVoice(); speechSynthesis.onvoiceschanged=()=>{ VOICE=pickVoice(); }; }
-function stopAll(){ if(canSpeak) speechSynthesis.cancel(); if(curAudio){ try{curAudio.pause();}catch(e){} curAudio=null; } }
-// Lee por frases, con una pequeña pausa entre ellas: la entonación queda mucho más natural que de un tirón.
-function speakTTS(text){
-  if(!canSpeak) return; speechSynthesis.cancel();
+// Un único <audio> reutilizado: el móvil lo "desbloquea" con el primer toque y luego deja que suene cuando llega la orden del profesor.
+const SILENT="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+const AUD=new Audio(); AUD.preload="auto"; AUD.setAttribute("playsinline","");
+let unlocked=false, pending=null;
+function stopAll(){ if(canSpeak) speechSynthesis.cancel(); try{ AUD.pause(); }catch(e){} curAudio=null; audioPaused=false; }
+function markDone(){ if(audioDone) return; audioDone=true; audioPaused=false; render(); }
+// Lee por frases con pausas: la entonación queda más natural que de un tirón (solo si no hay mp3).
+function speakTTS(text,onDone){
+  if(!canSpeak){ if(onDone) onDone(); return; } speechSynthesis.cancel();
   const parts=text.replace(/\s+/g," ").match(/[^.!?…]+[.!?…]+["»”]?|[^.!?…]+$/g)||[text];
   let i=0;
-  const next=()=>{ if(i>=parts.length) return; const u=new SpeechSynthesisUtterance(parts[i++].trim());
+  const next=()=>{ if(i>=parts.length){ if(onDone) onDone(); return; } const u=new SpeechSynthesisUtterance(parts[i++].trim());
     u.lang=(VOICE&&VOICE.lang)||"es-ES"; if(VOICE) u.voice=VOICE; u.rate=0.92; u.pitch=1.0; u.volume=1;
     u.onend=()=>setTimeout(next,260); u.onerror=()=>setTimeout(next,100); speechSynthesis.speak(u); };
   next();
 }
-// Si existe audio/<id>.mp3 (grabación propia o voz neuronal), suena ese; si no, la voz del móvil.
-// Un único <audio> reutilizado: el móvil lo "desbloquea" con el primer toque y luego deja que suene solo cuando llega la orden del profesor.
-const SILENT="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-const AUD=new Audio(); AUD.preload="auto"; AUD.setAttribute("playsinline","");
-let unlocked=false, pending=null;
 function unlockAudio(){
   if(unlocked) return;
   try{ AUD.src=SILENT; const pr=AUD.play(); if(pr&&pr.then) pr.then(()=>{ unlocked=true; AUD.pause(); hideBlocked(); if(pending){ const q=pending; pending=null; speak(q[0],q[1]); } }).catch(()=>{}); }catch(e){}
   if(canSpeak){ try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u);}catch(e){} }
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").catch(()=>{}); }catch(e){}
 }
 ["touchend","pointerdown","click","keydown"].forEach(ev=>document.addEventListener(ev,unlockAudio,{passive:true}));
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").catch(()=>{}); }catch(e){} } });
 function showBlocked(){
   let b=document.getElementById("blk");
   if(!b){ b=document.createElement("button"); b.id="blk"; b.type="button";
@@ -159,22 +162,34 @@ function showBlocked(){
     document.body.appendChild(b); }
 }
 function hideBlocked(){ const b=document.getElementById("blk"); if(b) b.remove(); }
+// Si existe audio/<id>.mp3 suena ese; si no, la voz del móvil.
 function speak(text,id){
-  stopAll(); hideBlocked();
+  stopAll(); hideBlocked(); audioDone=false; audioPaused=false;
   if(id){
-    curAudio=AUD; AUD.onended=null;
-    AUD.onerror=()=>{ if(curAudio===AUD){ curAudio=null; speakTTS(text); } };
+    curAudio=AUD; AUD.onended=markDone;
+    AUD.onerror=()=>{ if(curAudio===AUD){ curAudio=null; speakTTS(text,markDone); } };
     AUD.src="audio/"+id+".mp3"; AUD.currentTime=0;
     const pr=AUD.play();
     if(pr&&pr.catch) pr.catch(err=>{ if(curAudio!==AUD) return;
-      if(err&&err.name==="NotAllowedError"){ pending=[text,id]; showBlocked(); } else { curAudio=null; speakTTS(text); } });
+      if(err&&err.name==="NotAllowedError"){ pending=[text,id]; showBlocked(); } else { curAudio=null; speakTTS(text,markDone); } });
     return; }
-  speakTTS(text);
+  speakTTS(text,markDone);
+}
+// Órdenes del profesor: pausar, reanudar, parar.
+function applyCtl(c){
+  const s=state&&P[state.stop];
+  if(c.cmd==="pause"){ audioPaused=true; if(curAudio===AUD) AUD.pause(); else if(canSpeak) speechSynthesis.pause(); render(); }
+  else if(c.cmd==="resume"){ audioPaused=false;
+    if(curAudio===AUD){ const pr=AUD.play(); if(pr&&pr.catch) pr.catch(()=>{ if(s){ pending=[s.audio,s.id]; showBlocked(); } }); }
+    else if(canSpeak) speechSynthesis.resume(); render(); }
+  else if(c.cmd==="stop"){ stopAll(); audioDone=true; render(); }
 }
 
 // ---------- arranque ----------
 Store.on("claims",c=>{ claims=c||{}; if(!me||!me.av) renderJoin(); });
-Store.on("state",s=>{ state=s; render(); });
+Store.on("state",s=>{ state=s;
+  if(s&&s.ctl){ if(lastCtlSeq!==null && s.ctl.seq!==lastCtlSeq) applyCtl(s.ctl); lastCtlSeq=s.ctl.seq; }
+  render(); });
 Store.on("players",p=>{ players=p||{};
   if(me && me.joined && !players[me.id]){ localStorage.removeItem(PKEY); me=null; return renderJoin(); }
   if(me&&players[me.id]){ $("hPts").hidden=false; $("hPts").textContent=players[me.id].score||0; }
@@ -260,14 +275,39 @@ async function resolveDuel(){
 
 // ---------- vista principal ----------
 function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
+const mineKey=()=>{ if(!state||!P[state.stop]||state.phase!=="question") return ""; const m=myAnswers[state.stop+"_"+state.q]; return m?("r"+m.choice):"n"; };
+const rankSig=()=>Object.entries(players).filter(([,p])=>p.av).map(([id,p])=>id+":"+(p.score||0)+":"+JSON.stringify(p.by||0)).sort().join("|");
+// Evita redibujar toda la pantalla cuando solo cambia algo que no se ve (latidos de otros alumnos): así el scroll y el audio no se interrumpen.
 function render(){
   if(!me) return;
+  const ph0=state?state.phase:"lobby";
+  let sig;
+  if(duel||!me.av) sig="x"+Math.random();
+  else if(ph0==="lobby") sig="lobby|"+Object.entries(players).filter(([,p])=>p.av).map(([id])=>id).sort().join(",")+"|"+(state&&state.musica);
+  else if(ph0==="stop"||ph0==="audio") sig=[ph0,state.stop,state.audioSeq,audioDone,audioPaused].join("|");
+  else if(ph0==="question") sig=["q",state.stop,state.q,mineKey()].join("|");
+  else sig=[ph0,state.stop,rankSig()].join("|");
+  sig+="|"+(players[me.id]?"":"-");
+  if(sig===lastSig && $("main").children.length) return;
+  const phaseKey=ph0+":"+(state?state.stop:0)+":"+(state?state.q:0);
+  const keep=(lastSig.split("|")[0]===sig.split("|")[0]) && (lastSig.split("|")[1]===sig.split("|")[1]);
+  const y=window.scrollY; lastSig=sig;
+  renderNow(phaseKey);
+  if(keep) window.scrollTo(0,y); else window.scrollTo(0,0);
+}
+function renderNow(phaseKey){
   headerWho();
-  if(duel) return renderDuel();
-  if(!me.av) return renderJoin();
+  $("mbtn").textContent=Music.muted?"🔇":"🎵"; $("mbtn").onclick=()=>{ Music.mute(!Music.muted); $("mbtn").textContent=Music.muted?"🔇":"🎵"; };
+  if(duel){ Music.set(null); return renderDuel(); }
+  if(!me.av){ Music.set(null); return renderJoin(); }
+  const ph=state?state.phase:"lobby";
+  Music.enabled(!(state&&state.musica===false));
+  Music.set(ph==="lobby"?"espera":ph==="ranking"?"ranking":ph==="end"?"podium":null);
+  if(phaseKey!==lastPhaseKey){ const first=lastPhaseKey===""; lastPhaseKey=phaseKey; if(!first && ph!=="audio") stopAll(); }
   if(!state||state.phase==="lobby"){
     const others=Object.values(players).filter(p=>p.av);
     $("main").innerHTML=`<div class="card center"><div class="big-av">${avSVG(me.av,120)}</div><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el profesor empiece la visita. Ponte los auriculares.</p>
+      <p class="muted" style="font-size:14px;margin:4px 0 0">🎵 Toca la pantalla una vez para activar la música y el sonido.</p>
       <button class="btn ghost" id="test">🔊 Probar el audio</button>
       <p class="muted" style="font-size:13px;margin:6px 0 0">Si no oyes nada: sube el volumen, quita el modo silencio y pulsa el botón.</p>
       <h3>Ya en la sala (${others.length})</h3><div class="roster">${others.map(p=>`<span title="${esc(p.name)}">${avSVG(p.av,34)}</span>`).join("")}</div>
@@ -277,15 +317,18 @@ function render(){
     return;
   }
   const s=P[state.stop]; if(!s) return;
-  const ph=state.phase;
   if(ph==="stop"||ph==="audio"){
     if(ph==="audio" && state.audioSeq!==lastAudioSeq){ lastAudioSeq=state.audioSeq; speak(s.audio,s.id); }
+    const playing=ph==="audio"&&!audioDone;
     $("main").innerHTML=hero(s)+`<div class="card">
-      ${ph==="audio"?`<div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="muted center" style="margin:0">Escucha con tus auriculares. Después habrá preguntas.</p>
-        <button class="btn ghost" id="again">🔁 Volver a escuchar</button>
-        <details class="txt" ${state.audioSeq>1?"open":""}><summary>📖 ¿No lo oyes? Léelo aquí</summary><p>${esc(s.audio)}</p></details>`
+      ${ph==="audio"?(playing
+          ?(audioPaused?`<p class="center" style="margin:10px 0 0;font:700 18px var(--head)">⏸ El profesor ha pausado el audio</p>`
+                       :`<div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="muted center" style="margin:0">Escucha con tus auriculares. Después habrá preguntas.</p>`)
+          :`<p class="center" style="margin:10px 0 0;font:700 18px var(--head)">✅ Audio terminado</p><p class="muted center" style="margin:2px 0 0">Atento al profesor: ahora vienen las preguntas.</p>
+            <button class="btn ghost" id="again">🔁 Volver a escuchar</button>`)
+        +`<details class="txt" ${state.audioSeq>1?"open":""}><summary>📖 ¿No lo oyes? Léelo aquí</summary><p>${esc(s.audio)}</p></details>`
         :`<p class="muted center" style="margin:4px 0">📍 Estamos aquí. Escucha al profesor; enseguida sonará el audio en tu móvil.</p>`}</div>`;
-    const a=$("again"); if(a) a.onclick=()=>speak(s.audio,s.id);
+    const a=$("again"); if(a) a.onclick=()=>{ unlockAudio(); speak(s.audio,s.id); render(); };
     return;
   }
   if(ph==="question"){
@@ -311,16 +354,20 @@ async function answer(key,q,k){
   const correct=k===q.correcta, pts=U.points(correct,Store.now()-state.qStart);
   await Store.set("answers/"+key+"/"+me.id,{choice:k,correct,points:pts,t:Store.now()});
   await Store.transaction("players/"+me.id+"/score",cur=>(cur||0)+pts);
+  await Store.transaction("players/"+me.id+"/by/"+key.split("_")[0],cur=>(cur||0)+pts);
 }
 function renderRanking(final){
-  const list=Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av).sort((a,b)=>(b.score||0)-(a.score||0));
-  const pos=list.findIndex(p=>p.id===me.id)+1;
-  const pod=i=>list[i]?`<div class="pod p${i+1}"><div class="avw">${avSVG(list[i].av,i===0?64:50)}</div><b>${esc(list[i].name)}</b><small>${list[i].score||0}</small></div>`:`<div></div>`;
-  $("main").innerHTML=`<div class="card"><h2 class="center">${final?"🏁 Ranking final":"🏆 Ranking"}</h2>
-    <p class="muted center" style="margin:0">Vas en la posición <b>${pos}</b> de ${list.length}.${final?"":" Espera a que el profesor active la siguiente parada."}</p>
-    <div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>
-    ${list.slice(3,12).map((p,i)=>`<div class="rk ${p.id===me.id?"me":""}"><span class="pos">${i+4}</span>${avSVG(p.av,32)}<span>${esc(p.name)}</span><span class="sc">${p.score||0}</span></div>`).join("")}
-    ${pos>12?`<div class="rk me"><span class="pos">${pos}</span>${avSVG(me.av,32)}<span>${esc(me.name)}</span><span class="sc">${players[me.id]?players[me.id].score||0:0}</span></div>`:""}</div>`;
+  const list=Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av);
+  const sortedL=list.slice().sort((a,b)=>(b.score||0)-(a.score||0)||String(a.name).localeCompare(String(b.name)));
+  const pos=sortedL.findIndex(p=>p.id===me.id)+1;
+  if(final){
+    $("main").innerHTML=podiumView(list,me.id);
+    podiumReveal($("main"));
+  } else {
+    $("main").innerHTML=rankBoard(list,{stop:state.stop,meId:me.id,title:"🏆 Marcador",
+      sub:`Vas <b>${pos}º</b> de ${list.length} · ${esc(P[state.stop].nombre)}`,note:"Espera a que el profesor active la siguiente parada."});
+    rankAnimate($("main"));
+  }
 }
 </script>
 </body>
