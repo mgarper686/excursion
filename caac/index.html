@@ -75,6 +75,7 @@
   .opt:disabled{cursor:default}.opt.dim{filter:grayscale(.7) brightness(.75);opacity:.6}
   .opt.ok{outline:4px solid #fff;filter:none;opacity:1}.opt.bad{outline:4px solid var(--red);filter:none;opacity:1}
   .study{background:linear-gradient(135deg,#ffd54a,#ff9f1c);color:#3a2500;border-radius:14px;padding:10px 14px;margin:0 0 10px;font:800 17px/1.25 var(--head);text-align:center;box-shadow:0 4px 0 #b36b00}
+  .hint{background:#fff7d6;border:2px dashed #e8b923;color:#4a3a00;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:15px}
   .timer{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:12px 0 2px}.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));transition:width 1s linear}
   .result{text-align:center;padding:16px 0 4px}
   .result .big{font:800 52px var(--head);line-height:1;margin:6px 0}
@@ -298,8 +299,10 @@ async function resolveDuel(){
 }
 
 // ---------- vista principal ----------
-function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
-const mineKey=()=>{ if(!state||!P[state.stop]||state.phase!=="question") return ""; const m=myAnswers[state.stop+"_"+state.q]; return m?("r"+m.choice):"n"; };
+function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length}${state.nom?" · PLANO "+esc(s.plano):""}</span><h2>${state.nom?esc(s.nombre):"📍 ¿Sabes dónde estamos?"}</h2></div></div>`; }
+const lab=s=>state&&state.nom?s.nombre:"Parada "+(state.stop+1);
+const hinted={}, answering={};
+const mineKey=()=>{ if(!state||!P[state.stop]||state.phase!=="question") return ""; const k0=state.stop+"_"+state.q, m=myAnswers[k0]; return (m?("r"+m.choice):"n")+(hinted[k0]?"h":""); };
 const rankSig=()=>Object.entries(players).filter(([,p])=>p.av).map(([id,p])=>id+":"+(p.score||0)+":"+JSON.stringify(p.by||0)).sort().join("|");
 // Evita redibujar toda la pantalla cuando solo cambia algo que no se ve (latidos de otros alumnos): así el scroll y el audio no se interrumpen.
 function render(){
@@ -311,7 +314,7 @@ function render(){
   else if(ph0==="stop"||ph0==="audio") sig=[ph0,state.stop,state.audioSeq,audioDone,audioPaused].join("|");
   else if(ph0==="question") sig=["q",state.stop,state.q,mineKey()].join("|");
   else sig=[ph0,state.stop,rankSig()].join("|");
-  sig+="|"+(players[me.id]?"":"-");
+  sig+="|"+(players[me.id]?"":"-")+"|"+(state&&state.nom?1:0);
   if(sig===lastSig && $("main").children.length) return;
   const phaseKey=ph0+":"+(state?state.stop:0)+":"+(state?state.q:0);
   const keep=(lastSig.split("|")[0]===sig.split("|")[0]) && (lastSig.split("|")[1]===sig.split("|")[1]);
@@ -359,27 +362,47 @@ function renderNow(phaseKey){
   if(ph==="question"){
     const qs=qAll(s), q=qs[state.q], sur=state.q>=s.preguntas.length, key=state.stop+"_"+state.q, mine=myAnswers[key];
     if(!q) return;
+    const order=perm(q.opciones.length,key+"|"+state.qStart);
     $("main").innerHTML=`<div class="card" style="margin-top:14px">
-      <div class="muted" style="font-size:13px;font-weight:600">${sur?"🎲 Pregunta sorpresa · "+esc(s.nombre):esc(s.nombre)+" · pregunta "+(state.q+1)+" de "+s.preguntas.length}</div>
+      <div class="muted" style="font-size:13px;font-weight:600">${sur?"🎲 Pregunta sorpresa · "+esc(lab(s)):esc(lab(s))+" · pregunta "+(state.q+1)+" de "+s.preguntas.length}</div>
       ${sur?"":`<div class="dots">${s.preguntas.map((_,k)=>`<i class="${k<state.q?"done":(k===state.q?"on":"")}"></i>`).join("")}</div>`}
-      ${q.estudio?`<div class="study">${esc(E_ESTUDIO)}</div>`:""}
+      ${q.estudio?`<div class="study">${esc(E_ESTUDIO)}<br><small style="font-weight:700">⭐ Puntúa el doble (x${CONFIG.multEstudio||2})</small></div>`:""}
       <div class="q">${esc(q.q)}</div>
-      ${mine?"":`<div class="timer"><i id="tbar" style="width:100%"></i></div>`}
-      <div class="opts">${q.opciones.map((o,k)=>`<button class="opt ${mine?(k===q.correcta?"ok":(mine.choice===k?"bad":"dim")):""}" style="background:${OCOL[k]}" data-k="${k}" ${mine?"disabled":""}><span class="sh">${SHAPES[k]}</span>${esc(o)}</button>`).join("")}</div>
-      ${mine?`<div class="result"><div class="big ${mine.correct?"ok":"no"}">${mine.correct?"+"+mine.points:"0"}</div><p class="muted">${mine.correct?"¡Correcto! Espera a la siguiente pregunta…":"Esta vez no. Espera a la siguiente pregunta…"}</p></div>`:""}</div>`;
+      ${mine?"":`<div class="timer"><i id="tbar" style="width:100%"></i></div><div class="muted center" id="tsec" style="margin:2px 0 0;font-weight:800">⏱ ${CONFIG.segundosRespuesta||30} s</div>`}
+      ${(!mine&&q.pista)?(hinted[key]?`<div class="hint">💡 <b>Pista:</b> ${esc(q.pista)} <small>(si aciertas, −${CONFIG.penalizacionPista||300} pts)</small></div>`:`<button class="btn ghost" id="pista" type="button" style="margin-top:10px">💡 Ver pista (−${CONFIG.penalizacionPista||300} puntos)</button>`):""}
+      <div class="opts">${order.map((k,d)=>`<button class="opt ${mine?(k===q.correcta?"ok":(mine.choice===k?"bad":"dim")):""}" style="background:${OCOL[d]}" data-k="${k}" ${mine?"disabled":""}><span class="sh">${SHAPES[d]}</span>${esc(q.opciones[k])}</button>`).join("")}</div>
+      ${mine?resultHTML(mine):""}</div>`;
     if(!mine){
-      const secs=CONFIG.segundosRespuesta||20; clearInterval(timerInt);
-      timerInt=setInterval(()=>{ const el=$("tbar"); if(!el){clearInterval(timerInt);return;} const f=1-Math.min(1,(Store.now()-state.qStart)/(secs*1000)); el.style.width=(f*100)+"%"; },500);
+      const secs=CONFIG.segundosRespuesta||30; clearInterval(timerInt);
+      const tick=()=>{ const el=$("tbar"); if(!el){clearInterval(timerInt);return;}
+        const left=Math.max(0,secs*1000-(Store.now()-state.qStart)); el.style.width=(left/(secs*1000)*100)+"%"; const t=$("tsec"); if(t) t.textContent=left>0?("⏱ "+Math.ceil(left/1000)+" s"):"⏰ ¡Tiempo!";
+        if(left<=0){ clearInterval(timerInt); answer(key,q,-1); } };
+      tick(); timerInt=setInterval(tick,250);
       document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(key,q,+b.dataset.k));
+      const pb=$("pista"); if(pb) pb.onclick=()=>{ hinted[key]=true; render(); };
     }
     return;
   }
   if(ph==="ranking"||ph==="end") return renderRanking(ph==="end");
 }
+function resultHTML(m){
+  if(m.timeout) return `<div class="result"><div class="big no">⏰</div><p class="muted">¡Se acabó el tiempo! Espera a la siguiente pregunta…</p></div>`;
+  const parts=[]; if(m.x2) parts.push("📚 x2 por no estar en el audio"); if(m.racha) parts.push("🔥 racha de "+m.racha+": +"+Math.round(((CONFIG.bonusRacha||1.3)-1)*100)+"%"); if(m.pen) parts.push("💡 pista: −"+m.pen);
+  return `<div class="result"><div class="big ${m.correct?"ok":"no"}">${m.correct?"+"+m.points:"0"}</div><p class="muted">${m.correct?"¡Correcto! Espera a la siguiente pregunta…":"Esta vez no. Pierdes la racha. Espera a la siguiente pregunta…"}</p>${parts.length?`<p class="muted" style="font-size:13px;margin:4px 0 0">${parts.join(" · ")}</p>`:""}</div>`;
+}
 async function answer(key,q,k){
+  if(myAnswers[key]||answering[key]) return; answering[key]=true;
   document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
-  const correct=k===q.correcta, pts=U.points(correct,Store.now()-state.qStart);
-  await Store.set("answers/"+key+"/"+me.id,{choice:k,correct,points:pts,t:Store.now()});
+  const cfg=CONFIG, secs=cfg.segundosRespuesta||30, el=Store.now()-state.qStart;
+  const timeout=k===-1||el>secs*1000+1500;
+  const correct=!timeout&&k===q.correcta, used=!!hinted[key];
+  const base=U.points(correct,el);
+  const pen=(correct&&used)?Math.min(base,cfg.penalizacionPista||300):0;
+  const mEst=(q.estudio&&correct)?(cfg.multEstudio||2):1;
+  const ns=await Store.transaction("players/"+me.id+"/streak",cur=>correct?(cur||0)+1:0);
+  const rachaOn=correct&&ns>=(cfg.rachaMin||3);
+  const pts=correct?Math.round((base-pen)*mEst*(rachaOn?(cfg.bonusRacha||1.3):1)):0;
+  await Store.set("answers/"+key+"/"+me.id,{choice:timeout?-1:k,correct,points:pts,t:Store.now(),hint:used,pen,x2:mEst>1,racha:rachaOn?ns:0,timeout});
   await Store.transaction("players/"+me.id+"/score",cur=>(cur||0)+pts);
   await Store.transaction("players/"+me.id+"/by/"+key.split("_")[0],cur=>(cur||0)+pts);
 }
@@ -392,7 +415,7 @@ function renderRanking(final){
     podiumReveal($("main"));
   } else {
     $("main").innerHTML=rankBoard(list,{stop:state.stop,meId:me.id,title:"🏆 Marcador",
-      sub:(me.docente?`Participas fuera de concurso 👩‍🏫`:`Vas <b>${pos}º</b> de ${list.length}`)+` · ${esc(P[state.stop].nombre)}`,note:"Espera a que el profesor active la siguiente parada."});
+      sub:(me.docente?`Participas fuera de concurso 👩‍🏫`:`Vas <b>${pos}º</b> de ${list.length}`)+` · ${esc(lab(P[state.stop]))}`,note:"Espera a que el profesor active la siguiente parada."});
     rankAnimate($("main"));
   }
 }

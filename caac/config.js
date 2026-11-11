@@ -31,5 +31,11 @@ window.CONFIG = {
   // Puntuación tipo Kahoot: máximo por acierto y segundos hasta llegar al mínimo.
   puntosMax: 1000,
   puntosMin: 500,
-  segundosRespuesta: 20
+  segundosRespuesta: 30,
+
+  // Reglas extra de puntuación
+  penalizacionPista: 300,   // lo que resta usar la pista (antes de multiplicadores)
+  multEstudio: 2,           // las preguntas «no está en el audio» puntúan el doble
+  rachaMin: 3,              // aciertos seguidos para activar el bonus
+  bonusRacha: 1.3           // multiplicador con racha (+30%)
 };

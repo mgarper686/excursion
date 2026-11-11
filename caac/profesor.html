@@ -38,6 +38,15 @@
   .hero{position:relative;overflow:hidden;border-radius:20px 20px 0 0;background:var(--navy2);margin:-16px -16px 12px}
   .hero img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
   .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}.gal img{flex:0 0 100%;scroll-snap-align:start;width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+  .herobtns{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3}
+  .hb{background:#000a;color:#fff;border:1px solid #fff5;border-radius:10px;padding:7px 11px;font:700 13px var(--head);cursor:pointer}
+  .kw{color:#d62828}
+  .tcount{font:800 20px var(--head);margin:6px 0;color:var(--navy)}
+  .esqrow button{position:relative}.zm{position:absolute;top:4px;right:4px;background:#000a;color:#fff;border-radius:8px;padding:3px 7px;text-decoration:none;font-size:14px}
+  #lb{display:none;position:fixed;inset:0;background:#000e;z-index:999}#lb.on{display:block}
+  #lbs{position:absolute;inset:48px 0 0;overflow:auto;touch-action:pan-x pan-y pinch-zoom;text-align:center}
+  #lbi{max-width:none;width:max(100%,900px);height:auto;display:inline-block}
+  #lbx{position:absolute;top:8px;right:8px;z-index:2;background:#fff;border:0;border-radius:10px;padding:10px 16px;font:800 15px var(--head)}
   .hero .ov{pointer-events:none}.hero .tx{pointer-events:none}
   .hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,#0000 30%,#12233fe6 100%)}
   .hero .tx{position:absolute;left:16px;right:16px;bottom:14px;color:#fff}
@@ -132,7 +141,7 @@
     <div class="card">
       <div id="planBack"></div>
       <h3>¿Dónde estamos? Toca un punto o una foto para situarte</h3>
-      <div class="mapwrap"><img src="img/plano.jpg" alt="Plano del CAAC" id="mapimg"><div id="marks"></div></div>
+      <button type="button" class="btn ghost" data-zoom="img/plano.jpg" style="margin-bottom:8px">🔍 Ampliar plano</button><div class="mapwrap"><img src="img/plano.jpg" alt="Plano del CAAC" id="mapimg"><div id="marks"></div></div>
       <p class="muted small" style="margin:8px 0 0">Rojo: parada actual · verde: visitadas · números según el orden de la ruta.</p>
     </div>
     <div class="card"><h3>Recorrido en orden</h3><div class="grid" id="tiles"></div></div>
@@ -151,7 +160,7 @@
 const $=id=>document.getElementById(id), esc=U.esc, P=window.PARADAS;
 const SHAPES=["▲","◆","●","■","★","⬟","⬢","✚"], OCOL=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)","var(--o6)","#0e8f8f","#b5479a"];
 let state={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{}};
-const DEF={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{},prev:null,ctl:null,esq:null,musica:true};
+const DEF={stop:0,phase:"lobby",q:-1,qStart:0,audioSeq:0,visited:{},prev:null,ctl:null,esq:null,musica:true,nom:false};
 let players={}, answers={}, hearHere=false, hearMusic=false, twTimer=null, twDone=false, twText="", twI=0, twCps=15, twPaused=false, DUR={};
 const TAUD=new Audio(); TAUD.setAttribute("playsinline","");
 
@@ -181,7 +190,7 @@ const online=()=>Object.values(players).filter(p=>p.av).length;
 const TRACK={lobby:"espera",end:"podium"};
 
 function renderAll(){ renderParada(); renderMap(); renderTiles(); renderRank(); renderBack(); }
-function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div></div>`; }
+function hero(s){ const pics=s.fotos&&s.fotos.length>1?`<div class="gal">${s.fotos.map(src=>`<img src="${src}" alt="" loading="lazy">`).join("")}</div>`:U.imgTag(s,""); return `<div class="hero">${pics}<div class="ov"></div><div class="tx"><span class="n">PARADA ${state.stop+1} DE ${P.length} · PLANO ${esc(s.plano)}</span><h2>${esc(s.nombre)}</h2></div><div class="herobtns"><button type="button" class="hb" id="bNom">${state.nom?"🙈 Ocultar nombre":"👁 Mostrar nombre al alumnado"}</button><button type="button" class="hb" data-zoom="${(s.fotos&&s.fotos[0])||s.img||""}">🔍</button></div></div>`; }
 
 function ensureDur(id){ if(DUR[id]!==undefined) return; DUR[id]=0; try{ const a=new Audio(); a.preload="metadata"; a.src="audio/"+id+".mp3"; a.onloadedmetadata=()=>{ DUR[id]=a.duration||0; }; }catch(e){} }
 function rowsSala(){
@@ -199,7 +208,7 @@ function esqBlock(s){
   const rec=new Set(s.esquemas||[]); const list=(window.ESQUEMAS||[]).slice().sort((a,b)=>(rec.has(b.id)?1:0)-(rec.has(a.id)?1:0));
   const cur=state.esq&&state.esq.id;
   return `<h3>🖼 Esquemas para enseñar al alumnado</h3>
-    <div class="esqrow">${list.map(x=>`<button type="button" data-esq="${x.id}" class="${cur===x.id?"on":(rec.has(x.id)?"rec":"")}"><img src="${x.img}" alt=""><span>${rec.has(x.id)?"⭐ ":""}${esc(x.titulo)}</span></button>`).join("")}</div>
+    <div class="esqrow">${list.map(x=>`<button type="button" data-esq="${x.id}" class="${cur===x.id?"on":(rec.has(x.id)?"rec":"")}"><img src="${x.img}" alt=""><span>${rec.has(x.id)?"⭐ ":""}${esc(x.titulo)}</span><u class="zm" data-zoom="${x.img}" title="Ampliar">🔍</u></button>`).join("")}</div>
     ${cur?`<p class="muted small" style="margin:0">Los móviles están viendo «${esc((esquema(cur)||{}).titulo||"")}». <button class="btn ghost" id="bHideEsq" style="display:inline-block;width:auto;margin:0;padding:6px 12px;font-size:13px;box-shadow:none">Ocultar</button></p>`:`<p class="muted small" style="margin:0">Toca uno para mostrarlo en todos los móviles (⭐ = recomendado en esta parada).</p>`}`;
 }
 function surBlock(s){
@@ -210,7 +219,7 @@ function surBlock(s){
     <button class="btn amber" data-sur="${n+i}">🚀 Lanzarla ahora</button></details>`).join("");
 }
 function ampBlock(s){
-  return (s.ampliado||[]).length?`<details class="more"><summary>📚 Ampliar información (más datos para tu guion)</summary><ul class="guion" style="margin-top:8px">${s.ampliado.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
+  return (s.ampliado||[]).length?`<details class="more"><summary>📚 Ampliar información (más datos para tu guion)</summary><ul class="guion" style="margin-top:8px">${s.ampliado.map(x=>{const a=splitAmp(x);return `<li>${esc(a.t)}${a.k?` <b class="kw">→ ${esc(a.k)}</b>`:""}</li>`;}).join("")}</ul></details>`:"";
 }
 function undoBlock(){
   return state.prev?`<div class="undo"><span>¿Te equivocaste de parada?</span><button class="btn ghost" id="bUndo">↩ Volver a «${esc((P[state.prev.stop]||{}).nombre||"anterior")}»</button></div>`:"";
@@ -248,10 +257,13 @@ function renderParada(){
   } else if(ph==="question"){
     const q=qAll(s)[state.q], sur=state.q>=nQ, key=state.stop+"_"+state.q, ans=answers[key]||{};
     if(!q){ setState({phase:"stop",q:-1}); return; }
+    const order=perm(q.opciones.length,key+"|"+state.qStart);
     const counts=q.opciones.map((_,k)=>Object.values(ans).filter(a=>a.choice===k).length);
     const total=Object.keys(ans).length, n=online();
-    html+=`${q.estudio?`<div class="study">📚 PREGUNTA DE ESTUDIO: no está en el audio</div>`:""}${sur?`<div class="study" style="background:linear-gradient(135deg,#7dd3fc,#38bdf8);color:#082f49">🎲 Pregunta sorpresa</div>`:""}<div class="q">${esc(q.q)}</div>
-      ${q.opciones.map((o,k)=>`<div class="opt ${k===q.correcta?"ok":""}" style="background:${OCOL[k]}"><i class="fill" style="width:${total?counts[k]/total*100:0}%"></i><span class="sh">${SHAPES[k]}</span><span style="position:relative">${esc(o)}</span><span class="cnt">${counts[k]}</span></div>`).join("")}
+    html+=`${q.estudio?`<div class="study">📚 PREGUNTA DE ESTUDIO: no está en el audio · puntúa x${CONFIG.multEstudio||2}</div>`:""}${sur?`<div class="study" style="background:linear-gradient(135deg,#7dd3fc,#38bdf8);color:#082f49">🎲 Pregunta sorpresa</div>`:""}<div class="q">${esc(q.q)}</div>
+      <div class="tcount" id="tcount">⏱ ${CONFIG.segundosRespuesta||30} s</div>
+      ${q.pista?`<p class="muted small" style="margin:4px 0">💡 Pista (−${CONFIG.penalizacionPista||300}): ${esc(q.pista)}</p>`:""}
+      ${order.map((k,d)=>`<div class="opt ${k===q.correcta?"ok":""}" style="background:${OCOL[d]}"><i class="fill" style="width:${total?counts[k]/total*100:0}%"></i><span class="sh">${SHAPES[d]}</span><span style="position:relative">${esc(q.opciones[k])}</span><span class="cnt">${counts[k]}</span></div>`).join("")}
       <p class="muted" style="margin:12px 0 0">Han respondido <b>${total}</b> de ${n}</p>
       <div class="bar"><i style="width:${n?Math.min(100,total/n*100):0}%"></i></div>
       ${sur?`<button class="btn green" id="bBackStop">↩ Volver a la parada</button><button class="btn amber" id="bRank">🏆 Mostrar ranking al alumnado</button>`
@@ -296,19 +308,32 @@ function renderParada(){
   if(ph==="ranking"){ $("tRank").innerHTML=rankBoard(sortedPlayers(),{stop:state.stop,max:8,title:"🏆 Marcador",sub:esc(s.nombre)}); rankAnimate($("tRank")); }
   if(ph==="end"){ $("tPodium").innerHTML=podiumView(sortedPlayers()); podiumReveal($("tPodium")); }
   if(ph==="audio" && twTimer===null && !twDone) typewriter(s.audio);
+  const bn=$("bNom"); if(bn) bn.onclick=()=>setState({nom:!state.nom});
+  clearInterval(window._tc);
+  if(ph==="question"){ const secs=CONFIG.segundosRespuesta||30; const f=()=>{ const el=$("tcount"); if(!el){clearInterval(window._tc);return;} const l=Math.max(0,secs*1000-(Store.now()-state.qStart)); el.textContent=l>0?"⏱ "+Math.ceil(l/1000)+" s":"⏰ Tiempo agotado"; }; f(); window._tc=setInterval(f,500); }
 }
+// Lightbox: ampliar imágenes
+(function(){
+  const lb=document.createElement("div"); lb.id="lb"; lb.innerHTML='<button type="button" id="lbx">✕ Cerrar</button><div id="lbs"><img id="lbi" alt=""></div>'; document.body.appendChild(lb);
+  const close=()=>{ lb.classList.remove("on"); };
+  lb.addEventListener("click",e=>{ if(e.target.id!=="lbi") close(); });
+  document.addEventListener("click",e=>{
+    const z=e.target.closest("[data-zoom]"); if(z){ e.preventDefault(); e.stopPropagation(); const src=z.dataset.zoom; if(!src) return; $("lbi").src=src; lb.classList.add("on"); return; }
+    const h=e.target.closest(".hero img"); if(h){ $("lbi").src=h.getAttribute("src"); lb.classList.add("on"); }
+  },true);
+})();
 function sortedPlayers(){ return Object.entries(players).map(([id,p])=>Object.assign({id},p)).filter(p=>p.av&&!p.docente); }
-function finish(){ stopTw(); stopTeacherAudio(); const visited=Object.assign({},state.visited||{}); visited[state.stop]=true; setState({phase:"end",visited,q:-1}); showTab("parada"); }
+function finish(){ stopTw(); stopTeacherAudio(); const visited=Object.assign({},state.visited||{}); visited[state.stop]=true; setState({phase:"end",visited,q:-1,nom:false}); showTab("parada"); }
 
 function launchQ(k){ stopTw(); stopTeacherAudio(); setState({phase:"question",q:k,qStart:Store.now()}); }
 function goStop(k){
   stopTw(); stopTeacherAudio(); twDone=false; twText=""; twI=0;
   const old=state.visited||{}, visited=Object.assign({},old); visited[state.stop]=true;
-  setState({stop:k,phase:"stop",q:-1,visited,ctl:null,prev:{stop:state.stop,visited:Object.assign({},old)}}); showTab("parada");
+  setState({stop:k,phase:"stop",q:-1,visited,ctl:null,nom:false,prev:{stop:state.stop,visited:Object.assign({},old)}}); showTab("parada");
 }
 function undoStop(){
   if(!state.prev) return; stopTw(); stopTeacherAudio(); twDone=false;
-  setState({stop:state.prev.stop,phase:"stop",q:-1,visited:state.prev.visited||{},prev:null,ctl:null}); showTab("parada");
+  setState({stop:state.prev.stop,phase:"stop",q:-1,visited:state.prev.visited||{},prev:null,ctl:null,nom:false}); showTab("parada");
 }
 function stopTeacherAudio(){ try{ TAUD.pause(); }catch(e){} if("speechSynthesis" in window) speechSynthesis.cancel(); }
 function playAudio(){
