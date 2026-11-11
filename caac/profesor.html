@@ -40,7 +40,9 @@
   .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}.gal img{flex:0 0 100%;scroll-snap-align:start;width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
   .herobtns{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3}
   .hb{background:#000a;color:#fff;border:1px solid #fff5;border-radius:10px;padding:7px 11px;font:700 13px var(--head);cursor:pointer}
-  .kw{color:#d62828}
+  .kw{color:#d62828;font-weight:800}
+  .why{background:#fff8dc;border-left:4px solid #e8b923;border-radius:8px;padding:8px 10px;margin:8px 0;font-size:14px}
+  .qlist button{margin:4px 0}
   .tcount{font:800 20px var(--head);margin:6px 0;color:var(--navy)}
   .esqrow button{position:relative}.zm{position:absolute;top:4px;right:4px;background:#000a;color:#fff;border-radius:8px;padding:3px 7px;text-decoration:none;font-size:14px}
   #lb{display:none;position:fixed;inset:0;background:#000e;z-index:999}#lb.on{display:block}
@@ -209,6 +211,7 @@ function esqBlock(s){
   const cur=state.esq&&state.esq.id;
   return `<h3>🖼 Esquemas para enseñar al alumnado</h3>
     <div class="esqrow">${list.map(x=>`<button type="button" data-esq="${x.id}" class="${cur===x.id?"on":(rec.has(x.id)?"rec":"")}"><img src="${x.img}" alt=""><span>${rec.has(x.id)?"⭐ ":""}${esc(x.titulo)}</span><u class="zm" data-zoom="${x.img}" title="Ampliar">🔍</u></button>`).join("")}</div>
+    ${[...rec].filter(id=>((window.ESQ_WHY||{})[s.id]||{})[id]).map(id=>`<p class="why">⭐ <b>${esc((esquema(id)||{}).titulo||id)}:</b> ${esc(window.ESQ_WHY[s.id][id])}</p>`).join("")}
     ${cur?`<p class="muted small" style="margin:0">Los móviles están viendo «${esc((esquema(cur)||{}).titulo||"")}». <button class="btn ghost" id="bHideEsq" style="display:inline-block;width:auto;margin:0;padding:6px 12px;font-size:13px;box-shadow:none">Ocultar</button></p>`:`<p class="muted small" style="margin:0">Toca uno para mostrarlo en todos los móviles (⭐ = recomendado en esta parada).</p>`}`;
 }
 function surBlock(s){
@@ -219,7 +222,7 @@ function surBlock(s){
     <button class="btn amber" data-sur="${n+i}">🚀 Lanzarla ahora</button></details>`).join("");
 }
 function ampBlock(s){
-  return (s.ampliado||[]).length?`<details class="more"><summary>📚 Ampliar información (más datos para tu guion)</summary><ul class="guion" style="margin-top:8px">${s.ampliado.map(x=>{const a=splitAmp(x);return `<li>${esc(a.t)}${a.k?` <b class="kw">→ ${esc(a.k)}</b>`:""}</li>`;}).join("")}</ul></details>`:"";
+  return (s.ampliado||[]).length?`<details class="more"><summary>📚 Ampliar información (más datos para tu guion)</summary><ul class="guion" style="margin-top:8px">${s.ampliado.map(x=>{const a=splitAmp(x);return `<li>${esc(a.t)}${a.k?` <br><b class="kw">🗣 ${esc(a.k)}</b>`:""}</li>`;}).join("")}</ul></details>`:"";
 }
 function undoBlock(){
   return state.prev?`<div class="undo"><span>¿Te equivocaste de parada?</span><button class="btn ghost" id="bUndo">↩ Volver a «${esc((P[state.prev.stop]||{}).nombre||"anterior")}»</button></div>`:"";
@@ -253,6 +256,7 @@ function renderParada(){
             <button class="btn red" id="bStopAudio">⏹ Parar</button>
             <button class="btn navy" id="bAudio">🔁 Desde el principio</button></div>
           <button class="btn green" id="bQ0" ${twDone?"":"disabled"}>${twDone?"❓ Lanzar pregunta 1":"⏳ Sonando… (o pulsa Parar)"}</button>`}
+      ${ph==="stop"?`<details class="more qlist"><summary>❓ Lanzar una pregunta concreta (sin audio, o si te saltaste alguna)</summary>${qAll(s).map((q,i)=>i>=nQ?"":`<button type="button" class="btn ghost" data-lq="${i}">${i+1}. ${esc(String(q.q).replace(E_ESTUDIO,"").trim().slice(0,70))}${q.estudio?" 📚":""}</button>`).join("")}</details>`:""}
       <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>`;
   } else if(ph==="question"){
     const q=qAll(s)[state.q], sur=state.q>=nQ, key=state.stop+"_"+state.q, ans=answers[key]||{};
@@ -273,6 +277,7 @@ function renderParada(){
   } else if(ph==="ranking"){
     html+=`<p class="muted" style="margin:10px 0 0">El alumnado está viendo el marcador. Cuando lleguéis a la siguiente parada, pulsa:</p>
       ${state.stop+1<P.length?`<button class="btn green" id="bNextStop">→ Siguiente: ${esc(P[state.stop+1].nombre)}</button>`:`<button class="btn amber" id="bEnd">🏁 Terminar la visita (podio final)</button>`}
+      <button class="btn amber" id="bBackQ">↩ Volver a esta parada (para lanzar preguntas)</button>
       <button class="btn ghost" id="bPick">Elegir otra parada en el plano</button>
       ${surBlock(s)}${esqBlock(s)}
       <div class="endbar"><button class="btn ghost" id="bFinish">🏁 Terminar aquí y mostrar el podio final</button></div></div>
@@ -290,14 +295,17 @@ function renderParada(){
   on("bAudio",playAudio); on("bRepeat",playAudio);
   on("bPause",()=>audioCtl(paused?"resume":"pause")); on("bStopAudio",()=>audioCtl("stop"));
   on("bSkipAudio",()=>launchQ(0)); on("bQ0",()=>launchQ(0)); on("bNextQ",()=>launchQ(state.q+1));
-  on("bRank",()=>{ stopTeacherAudio(); setState({phase:"ranking"}); });
+  const revDonde=()=>{ const q=qAll(P[state.stop])[state.q]; return (q&&q.donde)?{nom:true}:{}; };
+  on("bRank",()=>{ stopTeacherAudio(); setState(Object.assign({phase:"ranking"},revDonde())); });
+  on("bBackQ",()=>setState({phase:"stop",q:-1}));
+  document.querySelectorAll("[data-lq]").forEach(b=>b.onclick=()=>launchQ(+b.dataset.lq));
   on("bNextStop",()=>goStop(state.stop+1));
   on("bEnd",()=>finish());
   on("bFinish",async()=>{ if(await U.ask("¿Terminar aquí y mostrar el podio con los tres primeros?","🏁 Terminar")) finish(); });
   on("bResume",()=>setState({phase:"stop",q:-1}));
   on("bReplay",()=>podiumReveal($("tPodium")));
   on("bPick",()=>showTab("plano"));
-  on("bUndo",undoStop); on("bBackStop",()=>setState({phase:"stop",q:-1}));
+  on("bUndo",undoStop); on("bBackStop",()=>setState(Object.assign({phase:"stop",q:-1},revDonde())));
   on("bHideEsq",()=>setState({esq:null}));
   document.querySelectorAll("[data-esq]").forEach(b=>b.onclick=()=>{ const id=b.dataset.esq; setState({esq:(state.esq&&state.esq.id===id)?null:{id,seq:Date.now()}}); });
   document.querySelectorAll("[data-sur]").forEach(b=>b.onclick=()=>{ launchQ(+b.dataset.sur); });
